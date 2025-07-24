@@ -261,7 +261,7 @@ class _EnglishclubState extends State<Englishclub> {
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.grey.withOpacity(0.2),
+                                            color: Colors.grey,
                                             spreadRadius: 1,
                                             blurRadius: 3,
                                             offset: const Offset(0, 2),
@@ -308,7 +308,6 @@ class _EnglishclubState extends State<Englishclub> {
                                                           BuildContext context,
                                                           int storyIndex,
                                                         ) {
-                                                          // ** هذا هو التعديل الأهم: الحصول على كائن القصة هنا **
                                                           final Stories
                                                           story = subDataItem
                                                               .stories![storyIndex];
@@ -333,7 +332,6 @@ class _EnglishclubState extends State<Englishclub> {
                                                                       debugPrint(
                                                                         '***************Passing Story ID from EnglishClub: ${story.id}',
                                                                       );
-                                                                      // ** تمرير story.id إلى StoryDetails **
                                                                       if (story
                                                                               .id !=
                                                                           null) {
@@ -341,7 +339,7 @@ class _EnglishclubState extends State<Englishclub> {
                                                                           Routes
                                                                               .storyDetails,
                                                                           arguments:
-                                                                              story.id, // <-- هنا يتم تمرير الـ ID
+                                                                              story.id,
                                                                         );
                                                                       } else {
                                                                         debugPrint(
@@ -364,19 +362,20 @@ class _EnglishclubState extends State<Englishclub> {
                                                                       child: Image.network(
                                                                         fit: BoxFit
                                                                             .cover,
-                                                                        story.coverUrl ??
-                                                                            'assets/images/bookCover.jpg',
-                                                                        errorBuilder:
-                                                                            (
-                                                                              context,
-                                                                              error,
-                                                                              stackTrace,
-                                                                            ) => const Image(
-                                                                              image: AssetImage(
-                                                                                "assets/images/bookCover.jpg",
-                                                                              ),
-                                                                              fit: BoxFit.cover,
-                                                                            ),
+                                                                        story
+                                                                            .coverUrl!,
+                                                                        // ! TODO FIX THE COVER ISSUE
+                                                                        // errorBuilder:
+                                                                        //     (
+                                                                        //       context,
+                                                                        //       error,
+                                                                        //       stackTrace,
+                                                                        //     ) => const Image(
+                                                                        //       image: AssetImage(
+                                                                        //         "assets/images/bookCover.jpg",
+                                                                        //       ),
+                                                                        //       fit: BoxFit.cover,
+                                                                        //     ),
                                                                       ),
                                                                     ),
                                                                   ),
