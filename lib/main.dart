@@ -15,7 +15,7 @@ void main(List<String> args) async {
 class EnglishClub extends StatelessWidget {
   final AppRouter appRouter;
 
-  EnglishClub({super.key, required this.appRouter});
+  const EnglishClub({super.key, required this.appRouter});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class EnglishClub extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: Routes.loginScreen,
+          initialRoute: Routes.englishclub,
           onGenerateRoute: appRouter.generateRoute,
         );
       },

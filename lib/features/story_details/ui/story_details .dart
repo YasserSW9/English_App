@@ -1,9 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:english_app/core/helpers/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_state.dart';
 import 'package:english_app/features/story_details/data/models/story_response.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class StoryDetails extends StatefulWidget {
   final int storyId;
@@ -114,7 +116,90 @@ class _StoryDetailsState extends State<StoryDetails> {
                                 color: Colors.blueGrey,
                                 size: 35.0,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => Center(
+                                    child: Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.white,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 20.0,
+                                            ),
+                                            child: Text(
+                                              "QR Code",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+
+                                          QrImageView(
+                                            data: story.qrCode.toString(),
+                                            version: QrVersions.auto,
+                                            size: 200.0,
+                                            eyeStyle: QrEyeStyle(
+                                              eyeShape: QrEyeShape.square,
+                                              color: Colors.black,
+                                            ),
+                                            dataModuleStyle: QrDataModuleStyle(
+                                              dataModuleShape:
+                                                  QrDataModuleShape.square,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Divider(
+                                            height: 1,
+                                            color: Colors.grey[300],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text(
+                                                  "Close",
+                                                  style: TextStyle(
+                                                    color: Colors.deepPurple,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {},
+                                                child: Text(
+                                                  "Download",
+                                                  style: TextStyle(
+                                                    color: Colors.deepPurple,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -126,9 +211,10 @@ class _StoryDetailsState extends State<StoryDetails> {
                         child: Card(
                           elevation: 2.0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(15.0),
                             side: const BorderSide(
                               color: Colors.amber,
+
                               width: 2.0,
                             ),
                           ),
@@ -144,7 +230,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                                   'Title',
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: Colors.black54,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 Text(
@@ -167,7 +253,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                         child: Card(
                           elevation: 2.0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(15.0),
                             side: const BorderSide(
                               color: Colors.amber,
                               width: 2.0,
@@ -185,7 +271,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                                   'Sub-Questions',
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: Colors.black54,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 Text(
@@ -209,7 +295,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                         child: Card(
                           elevation: 2.0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(15.0),
                             side: const BorderSide(
                               color: Colors.amber,
                               width: 2.0,
@@ -227,7 +313,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                                   'Quantity',
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: Colors.black54,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 Text(
@@ -250,7 +336,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                         child: Card(
                           elevation: 2.0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(15.0),
                             side: const BorderSide(
                               color: Colors.amber,
                               width: 2.0,
@@ -268,7 +354,7 @@ class _StoryDetailsState extends State<StoryDetails> {
                                   'Allowed borrow days',
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: Colors.black54,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 Text(
@@ -315,7 +401,7 @@ class _StoryDetailsState extends State<StoryDetails> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.deepPurple,
-        mini: true,
+
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
