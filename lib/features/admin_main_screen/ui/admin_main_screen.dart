@@ -1,5 +1,6 @@
 // lib/admin_main_screen.dart
 import 'package:english_app/features/profile_page/ui/profile_page.dart';
+import 'package:english_app/features/search_page/ui/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'widgets/custom_app_bar.dart';
@@ -19,12 +20,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
   final List<Widget> _bottomNavPages = [
     NotificationsPageContent(),
-    Center(
-      child: Text(
-        'Search Page Content',
-        style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-      ),
-    ),
+
+    SearchPage(),
     ProfilePage(),
   ];
 
