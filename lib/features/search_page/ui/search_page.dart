@@ -2,7 +2,7 @@
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
-import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart';
+import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart'; // تأكد من وجود هذا الويجت
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,16 +14,17 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final Set<int> _expandedCards = {};
+  final Set<int> _expandedCards = {}; // لتتبع حالة توسيع البطاقات
 
   String _selectedClassFilter = 'All';
   String _selectedGradeFilter = 'All';
 
-  List<String> _currentClassOptions = [];
+  List<String> _currentClassOptions = ['All'];
 
   @override
   void initState() {
     super.initState();
+
     final ClassCubit classCubit = context.read<ClassCubit>();
 
     classCubit.emitGetClassesLoaded().then((_) {
@@ -39,15 +40,22 @@ class _SearchPageState extends State<SearchPage> {
       } else if (_selectedGradeFilter == 'All') {
         _currentClassOptions = ['All'];
         _selectedClassFilter = 'All';
-      } else {
-        _currentClassOptions = ['All', 'temp1', "sec1", "sec2", "sec3", "sec4"];
+      } else if (_selectedGradeFilter == 'Grade 7') {
+        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
 
+        if (!_currentClassOptions.contains(_selectedClassFilter)) {
+          _selectedClassFilter = _currentClassOptions.first;
+        }
+      } else {
+        // للدرجات الأخرى (8, 9, 10) أو أي حالة غير محددة، عرض جميع الخيارات الممكنة
+        _currentClassOptions = ['All', 'temp1', "sec1", "sec2", "sec3", "sec4"];
+        // إذا كانت الفئة المختارة حاليًا غير موجودة، أعد تعيينها إلى 'All'
         if (!_currentClassOptions.contains(_selectedClassFilter)) {
           _selectedClassFilter = 'All';
         }
       }
     });
-
+    // بعد تحديث الـ UI (القوائم المنسدلة)، قم بتطبيق الفلاتر على الـ Cubit
     context.read<ClassCubit>().applyFilters(
       selectedClass: _selectedClassFilter,
       selectedGrade: _selectedGradeFilter,
@@ -62,12 +70,12 @@ class _SearchPageState extends State<SearchPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
+          // الجزء العلوي من الصفحة: العنوان، فلاتر القوائم المنسدلة، شريط البحث
           Column(
             children: [
               Container(
                 color: Colors.deepPurpleAccent.shade100,
                 width: double.infinity,
-
                 child: const Center(
                   child: Text(
                     'Search',
@@ -80,6 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(height: 10),
+              // فلاتر القوائم المنسدلة (Class و Grade)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -98,32 +107,41 @@ class _SearchPageState extends State<SearchPage> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            value: _selectedClassFilter,
+                            value:
+                                _selectedClassFilter, // القيمة الحالية المختارة للفئة
                             icon: const Icon(
                               Icons.arrow_drop_down,
                               color: Colors.black,
                             ),
-
-                            items: _currentClassOptions
-                                .map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(value),
-                                    ),
-                                  );
-                                })
-                                .toList(),
+                            items:
+                                _currentClassOptions // استخدام الخيارات الديناميكية للفئات
+                                    .map<DropdownMenuItem<String>>((
+                                      String value,
+                                    ) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 8.0,
+                                          ),
+                                          child: Text(
+                                            value,
+                                          ), // عرض قيمة الفئة مباشرةً
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
                             onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedClassFilter = newValue!;
-                              });
-
-                              classCubit.applyFilters(
-                                selectedClass: newValue,
-                                selectedGrade: _selectedGradeFilter,
-                              );
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedClassFilter = newValue;
+                                });
+                                // تطبيق الفلتر على الـ Cubit مباشرة
+                                classCubit.applyFilters(
+                                  selectedClass: newValue,
+                                  selectedGrade: _selectedGradeFilter,
+                                );
+                              }
                             },
                           ),
                         ),
@@ -144,7 +162,8 @@ class _SearchPageState extends State<SearchPage> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            value: _selectedGradeFilter,
+                            value:
+                                _selectedGradeFilter, // القيمة الحالية المختارة للدرجة
                             icon: const Icon(
                               Icons.arrow_drop_down,
                               color: Colors.black,
@@ -167,10 +186,13 @@ class _SearchPageState extends State<SearchPage> {
                                   );
                                 }).toList(),
                             onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedGradeFilter = newValue!;
-                              });
-                              _updateClassDropdownOptions(); // <--- تحديث خيارات الصفوف عند تغيير الدرجة
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedGradeFilter = newValue;
+                                });
+                                // عند تغيير الدرجة، قم بتحديث خيارات الفئة أيضاً
+                                _updateClassDropdownOptions();
+                              }
                             },
                           ),
                         ),
@@ -180,6 +202,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(height: 10),
+              // شريط البحث
               SearchBarWidget(
                 onChanged: (query) {
                   classCubit.searchController.text = query;
@@ -197,12 +220,15 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
 
+          // الجزء السفلي: عرض قائمة الطلاب باستخدام BlocConsumer
           Expanded(
             child: BlocConsumer<ClassCubit, ClassState<List<Students>>>(
-              listener: (context, state) {},
+              listener: (context, state) {
+                // يمكنك إضافة منطق للاستماع هنا، مثل عرض رسائل خطأ أو تنبيهات
+              },
               builder: (context, state) {
                 return state.when(
-                  initial: () => const Center(child: Text("Loading ...")),
+                  initial: () => const Center(child: Text("Preparing data...")),
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   success: (displayedStudents) {
@@ -219,7 +245,10 @@ class _SearchPageState extends State<SearchPage> {
                         final student = displayedStudents[index];
                         final bool isExpanded = _expandedCards.contains(index);
 
-                        String displayedGradeName;
+                        // منطق لتحديد اسم الدرجة المعروض بشكل صحيح
+                        String displayedGradeName =
+                            student.gradeName ?? "غير معروف";
+                        // يمكنك استخدام gClassId لتعيين اسم الدرجة بشكل أكثر دقة إذا كان gradeName غير متوفر
                         if (student.gClassId == 1) {
                           displayedGradeName = 'Temporary';
                         } else if (student.gClassId == 2) {
@@ -230,12 +259,14 @@ class _SearchPageState extends State<SearchPage> {
                           displayedGradeName = 'Grade 9';
                         } else if (student.gClassId == 5) {
                           displayedGradeName = 'Grade 10';
-                        } else {
-                          displayedGradeName = student.gradeName ?? "Unknown";
                         }
 
-                        final String studentDetails =
-                            '${student.className ?? "unKonown"} \\ $displayedGradeName \\ ${student.inactive == 1 ? "Active" : "inActive"}';
+                        // التأكد من عدم وجود قيم null للأسماء والحالات للعرض
+                        final String studentClassName =
+                            student.className ?? "UnKonown";
+                        final String studentStatus = student.inactive == 1
+                            ? "Active"
+                            : "InActive";
 
                         return Card(
                           color: Colors.grey.shade100,
@@ -269,13 +300,14 @@ class _SearchPageState extends State<SearchPage> {
                                     children: [
                                       CircleAvatar(
                                         radius: 25,
-                                        backgroundColor: Colors.green,
-
+                                        backgroundColor:
+                                            Colors.green, // خلفية افتراضية
                                         child:
-                                            student.profilePicture != null &&
+                                            // تحقق صارم من أن profilePicture هو URL صالح للشبكة (http/https)
+                                            (student.profilePicture != null &&
                                                 student
                                                     .profilePicture!
-                                                    .isNotEmpty
+                                                    .isNotEmpty)
                                             ? ClipOval(
                                                 child: Image.network(
                                                   student.profilePicture!,
@@ -288,6 +320,7 @@ class _SearchPageState extends State<SearchPage> {
                                                         error,
                                                         stackTrace,
                                                       ) {
+                                                        // في حالة فشل تحميل الصورة، عرض أيقونة شخص
                                                         return const Icon(
                                                           Icons.person,
                                                           color: Colors.white,
@@ -318,7 +351,7 @@ class _SearchPageState extends State<SearchPage> {
                                               ),
                                             ),
                                             Text(
-                                              studentDetails,
+                                              '$studentClassName \\ $displayedGradeName \\ $studentStatus',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey[900],
@@ -335,6 +368,7 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                     ],
                                   ),
+                                  // الجزء الموسع للبطاقة (إذا كانت isExpanded صحيحة)
                                   if (isExpanded)
                                     Column(
                                       children: [
@@ -343,238 +377,44 @@ class _SearchPageState extends State<SearchPage> {
                                           thickness: 1,
                                           color: Colors.grey,
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/studentScore.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Score',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.score ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        // عرض تفاصيل إضافية للطالب (الدرجات، العملات، القصص المكتملة، المستويات)
+                                        _buildDetailRow(
+                                          "Score",
+                                          "${student.score ?? 0}",
+                                          "assets/images/studentScore.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/golden.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Golden cards',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.goldenCoins ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Golden cards",
+                                          "${student.goldenCoins ?? 0}",
+                                          "assets/images/golden.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/silver.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Silver cards',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.silverCoins ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Silver cards",
+                                          "${student.silverCoins ?? 0}",
+                                          "assets/images/silver.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/bronze.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Bronze cards',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.bronzeCoins ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Bronze cards",
+                                          "${student.bronzeCoins ?? 0}",
+                                          "assets/images/bronze.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/borrowBook.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Limit borrow books',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.borrowLimit ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Limit borrow books",
+                                          "${student.borrowLimit ?? 0}",
+                                          "assets/images/borrowBook.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/finishedStudentStories.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Finished stories',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.finishedStoriesCount ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Finished stories",
+                                          "${student.finishedStoriesCount ?? 0}",
+                                          "assets/images/finishedStudentStories.png",
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child: Image.asset(
-                                                  "assets/images/studentLevel.png",
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
-                                                child: Text(
-                                                  'Finished Levels',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${student.finishedLevelsCount ?? 0}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildDetailRow(
+                                          "Finished Levels",
+                                          "${student.finishedLevelsCount ?? 0}",
+                                          "assets/images/studentLevel.png",
                                         ),
                                         const SizedBox(height: 10),
+                                        // أزرار التحديث وخريطة الطريق
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -636,6 +476,7 @@ class _SearchPageState extends State<SearchPage> {
                     );
                   },
                   error: (error) {
+                    // عرض رسالة الخطأ مع زر لإعادة المحاولة
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -672,6 +513,7 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 60),
         ],
       ),
+      // زر عائم في الزاوية اليمنى السفلية
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -679,6 +521,29 @@ class _SearchPageState extends State<SearchPage> {
         },
         backgroundColor: Colors.green,
         child: const Icon(Icons.download, color: Colors.white),
+      ),
+    );
+  }
+
+  // دالة مساعدة لإنشاء صفوف تفاصيل الطالب الموسعة لتقليل تكرار الكود
+  Widget _buildDetailRow(String label, String value, String iconPath) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          SizedBox(width: 24, height: 24, child: Image.asset(iconPath)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ],
       ),
     );
   }
