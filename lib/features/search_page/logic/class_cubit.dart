@@ -21,6 +21,10 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
   List<String> _uniqueClassNames = ['All']; // هذه ستتغير بناءً على الدرجة
   List<String> _uniqueGradeNames = ['All']; // هذه ثابتة بعد التحميل الأولي
 
+  // تواريخ الفلترة الحالية
+  DateTime? _currentStartDate;
+  DateTime? _currentEndDate;
+
   ClassCubit(this._classRepo) : super(const ClassState.initial());
 
   List<String> get uniqueClassNames => _uniqueClassNames;
@@ -30,16 +34,28 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
   String get selectedGradeFilter =>
       _selectedGradeFilter; // Getter للقيمة المختارة
 
-  Future<void> emitGetClassesLoaded() async {
+  Future<void> emitGetClassesLoaded({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     emit(const ClassState.loading());
     print('ClassCubit: Starting emitGetClassesLoaded...');
 
-    final String startDate = '11/4/2023';
-    final String endDate = '11/4/2024';
+    // استخدام التواريخ الجديدة إذا تم توفيرها، وإلا استخدام التواريخ الحالية أو الافتراضية
+    // الافتراضي هو 11/4/2023 و 11/4/2024 كما كان في الكود الأصلي، ولكن الآن كـ DateTime
+    _currentStartDate = startDate ?? _currentStartDate ?? DateTime(2023, 4, 11);
+    _currentEndDate = endDate ?? _currentEndDate ?? DateTime(2024, 4, 11);
+
+    // تحويل تواريخ DateTime إلى String بالصيغة المطلوبة (YYYY-MM-DD هو الأفضل للـ API عادةً)
+    // تأكد أن هذا يتطابق مع ما يتوقعه الـ API الخاص بك
+    final String formattedStartDate =
+        "${_currentStartDate!.year}-${_currentStartDate!.month.toString().padLeft(2, '0')}-${_currentStartDate!.day.toString().padLeft(2, '0')}";
+    final String formattedEndDate =
+        "${_currentEndDate!.year}-${_currentEndDate!.month.toString().padLeft(2, '0')}-${_currentEndDate!.day.toString().padLeft(2, '0')}";
 
     final response = await _classRepo.getClasses(
-      startDate: startDate,
-      endDate: endDate,
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     );
 
     response.when(
@@ -101,6 +117,20 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
           ),
         );
       },
+    );
+  }
+
+  // دالة عامة لتحديث نطاق التاريخ
+  void updateDateRange({
+    required DateTime? startDate,
+    required DateTime? endDate,
+  }) {
+    _currentStartDate = startDate;
+    _currentEndDate = endDate;
+    // إعادة تحميل البيانات باستخدام التواريخ الجديدة
+    emitGetClassesLoaded(
+      startDate: _currentStartDate,
+      endDate: _currentEndDate,
     );
   }
 
