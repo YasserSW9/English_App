@@ -40,19 +40,19 @@ class _SearchPageState extends State<SearchPage> {
       } else if (_selectedGradeFilter == 'All') {
         _currentClassOptions = ['All'];
         _selectedClassFilter = 'All';
-      } else if (_selectedGradeFilter == 'Grade 7') {
-        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
-      } else if (_selectedGradeFilter == 'Grade 8') {
-        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
-      } else if (_selectedGradeFilter == 'Grade 9') {
-        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
-      } else if (_selectedGradeFilter == 'Grade 10') {
-        _currentClassOptions = ['sec1'];
-
         if (!_currentClassOptions.contains(_selectedClassFilter)) {
           _selectedClassFilter = _currentClassOptions.first;
         }
+      } else if (_selectedGradeFilter.startsWith('Grade')) {
+        // هذا هو الجزء الذي يجب أن تحدده للصفوف من 7 إلى 10
+        // بناءً على متطلباتك، يمكن أن تحتوي هذه الصفوف على sec1, sec2, sec3, sec4
+        _currentClassOptions = ['All', 'sec1', 'sec2', 'sec3', 'sec4'];
+        // إذا كانت القيمة المحددة حاليًا غير موجودة في الخيارات الجديدة، قم بتعيينها إلى 'All'
+        if (!_currentClassOptions.contains(_selectedClassFilter)) {
+          _selectedClassFilter = 'All';
+        }
       } else {
+        // حالة عامة لأي Grade أخرى أو افتراضية
         _currentClassOptions = ['All', 'temp1', "sec1", "sec2", "sec3", "sec4"];
 
         if (!_currentClassOptions.contains(_selectedClassFilter)) {
@@ -75,7 +75,6 @@ class _SearchPageState extends State<SearchPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // الجزء العلوي من الصفحة: العنوان، فلاتر القوائم المنسدلة، شريط البحث
           Column(
             children: [
               Container(
@@ -242,22 +241,6 @@ class _SearchPageState extends State<SearchPage> {
                         final student = displayedStudents[index];
                         final bool isExpanded = _expandedCards.contains(index);
 
-                        // منطق لتحديد اسم الدرجة المعروض بشكل صحيح
-                        String displayedGradeName =
-                            student.gradeName ?? "غير معروف";
-                        // يمكنك استخدام gClassId لتعيين اسم الدرجة بشكل أكثر دقة إذا كان gradeName غير متوفر
-                        // if (student.gClassId == 1) {
-                        //   displayedGradeName = 'Temporary';
-                        // } else if (student.gClassId == 2) {
-                        //   displayedGradeName = 'Grade 7';
-                        // } else if (student.gClassId == 3) {
-                        //   displayedGradeName = 'Grade 8';
-                        // } else if (student.gClassId == 4) {
-                        //   displayedGradeName = 'Grade 9';
-                        // } else if (student.gClassId == 5) {
-                        //   displayedGradeName = 'Grade 10';
-                        // }
-
                         // التأكد من عدم وجود قيم null للأسماء والحالات للعرض
                         final String studentClassName =
                             student.className ?? "UnKonown";
@@ -302,7 +285,6 @@ class _SearchPageState extends State<SearchPage> {
                                         backgroundColor:
                                             Colors.green, // خلفية افتراضية
                                         child:
-                                            // تحقق صارم من أن profilePicture هو URL صالح للشبكة (http/https)
                                             (student.profilePicture != null &&
                                                 student
                                                     .profilePicture!
@@ -367,7 +349,7 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                     ],
                                   ),
-                                  // الجزء الموسع للبطاقة (إذا كانت isExpanded صحيحة)
+
                                   if (isExpanded)
                                     Column(
                                       children: [
@@ -376,7 +358,7 @@ class _SearchPageState extends State<SearchPage> {
                                           thickness: 1,
                                           color: Colors.grey,
                                         ),
-                                        // عرض تفاصيل إضافية للطالب (الدرجات، العملات، القصص المكتملة، المستويات)
+
                                         _buildDetailRow(
                                           "Score",
                                           "${student.score ?? 0}",
@@ -413,7 +395,7 @@ class _SearchPageState extends State<SearchPage> {
                                           "assets/images/studentLevel.png",
                                         ),
                                         const SizedBox(height: 10),
-                                        // أزرار التحديث وخريطة الطريق
+
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -475,7 +457,6 @@ class _SearchPageState extends State<SearchPage> {
                     );
                   },
                   error: (error) {
-                    // عرض رسالة الخطأ مع زر لإعادة المحاولة
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -512,7 +493,7 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 60),
         ],
       ),
-      // زر عائم في الزاوية اليمنى السفلية
+
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -524,7 +505,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // دالة مساعدة لإنشاء صفوف تفاصيل الطالب الموسعة لتقليل تكرار الكود
   Widget _buildDetailRow(String label, String value, String iconPath) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
