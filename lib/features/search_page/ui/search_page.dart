@@ -2,7 +2,7 @@
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
-import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart'; // تأكد من وجود هذا الويجت
+import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,55 +16,33 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final Set<int> _expandedCards = {};
 
-  String _selectedClassFilter = 'All';
-  String _selectedGradeFilter = 'All';
+  // These should reflect the state of the Cubit, not manage their own state for filters
+  // String _selectedClassFilter = 'All'; // No longer needed here
+  // String _selectedGradeFilter = 'All'; // No longer needed here
 
-  List<String> _currentClassOptions = ['All'];
+  // No longer needed as options come directly from Cubit
+  // List<String> _currentClassOptions = ['All'];
 
   @override
   void initState() {
     super.initState();
-
-    final ClassCubit classCubit = context.read<ClassCubit>();
-
-    classCubit.emitGetClassesLoaded().then((_) {
-      _updateClassDropdownOptions();
-    });
+    // Fetch initial data and then Cubit will set its internal filters and unique names
+    context.read<ClassCubit>().emitGetClassesLoaded();
   }
 
-  void _updateClassDropdownOptions() {
-    setState(() {
-      if (_selectedGradeFilter == 'Temporary') {
-        _currentClassOptions = ['temp1'];
-        _selectedClassFilter = 'temp1';
-      } else if (_selectedGradeFilter == 'All') {
-        _currentClassOptions = ['All'];
-        _selectedClassFilter = 'All';
-        if (!_currentClassOptions.contains(_selectedClassFilter)) {
-          _selectedClassFilter = _currentClassOptions.first;
-        }
-      } else if (_selectedGradeFilter.startsWith('Grade')) {
-        // هذا هو الجزء الذي يجب أن تحدده للصفوف من 7 إلى 10
-        // بناءً على متطلباتك، يمكن أن تحتوي هذه الصفوف على sec1, sec2, sec3, sec4
-        _currentClassOptions = ['All', 'sec1', 'sec2', 'sec3', 'sec4'];
-        // إذا كانت القيمة المحددة حاليًا غير موجودة في الخيارات الجديدة، قم بتعيينها إلى 'All'
-        if (!_currentClassOptions.contains(_selectedClassFilter)) {
-          _selectedClassFilter = 'All';
-        }
-      } else {
-        // حالة عامة لأي Grade أخرى أو افتراضية
-        _currentClassOptions = ['All', 'temp1', "sec1", "sec2", "sec3", "sec4"];
+  // This method will now primarily trigger a UI rebuild and ensure Cubit's state is consistent
+  void _updateFiltersAndDropdowns() {
+    final ClassCubit classCubit = context.read<ClassCubit>();
 
-        if (!_currentClassOptions.contains(_selectedClassFilter)) {
-          _selectedClassFilter = 'All';
-        }
-      }
-    });
-    // بعد تحديث الـ UI (القوائم المنسدلة)، قم بتطبيق الفلاتر على الـ Cubit
-    context.read<ClassCubit>().applyFilters(
-      selectedClass: _selectedClassFilter,
-      selectedGrade: _selectedGradeFilter,
+    // This ensures the cubit's internal selectedClassFilter and selectedGradeFilter are in sync with UI
+    // And also recalculates uniqueClassNames based on the grade filter
+    classCubit.applyFilters(
+      selectedClass:
+          classCubit.selectedClassFilter, // Use cubit's current value
+      selectedGrade:
+          classCubit.selectedGradeFilter, // Use cubit's current value
     );
+    // No need for setState here, as BlocConsumer will rebuild when state changes in cubit
   }
 
   @override
@@ -92,7 +70,6 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -109,35 +86,43 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedClassFilter,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black,
-                            ),
-                            items: _currentClassOptions
-                                .map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(value),
-                                    ),
-                                  );
-                                })
-                                .toList(),
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                                setState(() {
-                                  _selectedClassFilter = newValue;
-                                });
-
-                                classCubit.applyFilters(
-                                  selectedClass: newValue,
-                                  selectedGrade: _selectedGradeFilter,
-                                );
-                              }
+                          child: BlocBuilder<ClassCubit, ClassState<List<Students>>>(
+                            builder: (context, state) {
+                              return DropdownButton<String>(
+                                isExpanded: true,
+                                // Use the value from the cubit's state
+                                value: classCubit.selectedClassFilter,
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.black,
+                                ),
+                                // Use the uniqueClassNames from the cubit
+                                items: classCubit.uniqueClassNames
+                                    .map<DropdownMenuItem<String>>((
+                                      String value,
+                                    ) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 8.0,
+                                          ),
+                                          child: Text(value),
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    // Update the cubit's class filter and trigger a rebuild
+                                    classCubit.applyFilters(
+                                      selectedClass: newValue,
+                                      selectedGrade: classCubit
+                                          .selectedGradeFilter, // Keep the current grade filter
+                                    );
+                                  }
+                                },
+                              );
                             },
                           ),
                         ),
@@ -156,39 +141,44 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value:
-                                _selectedGradeFilter, // القيمة الحالية المختارة للدرجة
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black,
-                            ),
-                            items:
-                                const <String>[
-                                  'All',
-                                  'Temporary',
-                                  'Grade 7',
-                                  'Grade 8',
-                                  'Grade 9',
-                                  'Grade 10',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(value),
-                                    ),
-                                  );
-                                }).toList(),
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                                setState(() {
-                                  _selectedGradeFilter = newValue;
-                                });
-                                // عند تغيير الدرجة، قم بتحديث خيارات الفئة أيضاً
-                                _updateClassDropdownOptions();
-                              }
+                          child: BlocBuilder<ClassCubit, ClassState<List<Students>>>(
+                            builder: (context, state) {
+                              return DropdownButton<String>(
+                                isExpanded: true,
+                                // Use the value from the cubit's state
+                                value: classCubit.selectedGradeFilter,
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.black,
+                                ),
+                                // Use the uniqueGradeNames from the cubit (these are static once loaded)
+                                items: classCubit.uniqueGradeNames
+                                    .map<DropdownMenuItem<String>>((
+                                      String value,
+                                    ) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 8.0,
+                                          ),
+                                          child: Text(value),
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    // Update the cubit's grade filter, this will also reset class filter to 'All'
+                                    // and recalculate available class names.
+                                    classCubit.applyFilters(
+                                      selectedClass:
+                                          'All', // Reset class filter to 'All' when grade changes
+                                      selectedGrade: newValue,
+                                    );
+                                  }
+                                },
+                              );
                             },
                           ),
                         ),
@@ -198,7 +188,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              // شريط البحث
+              // Search bar
               SearchBarWidget(
                 onChanged: (query) {
                   classCubit.searchController.text = query;
@@ -206,9 +196,11 @@ class _SearchPageState extends State<SearchPage> {
                 },
                 hintText: 'Search',
                 onFilterPressed: () {
+                  // This button might not be strictly necessary if filters apply on dropdown change
+                  // but it's good to keep if there are other filter triggers
                   classCubit.applyFilters(
-                    selectedClass: _selectedClassFilter,
-                    selectedGrade: _selectedGradeFilter,
+                    selectedClass: classCubit.selectedClassFilter,
+                    selectedGrade: classCubit.selectedGradeFilter,
                   );
                 },
               ),
@@ -216,11 +208,11 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
 
-          // الجزء السفلي: عرض قائمة الطلاب باستخدام BlocConsumer
+          // Bottom section: display student list using BlocConsumer
           Expanded(
             child: BlocConsumer<ClassCubit, ClassState<List<Students>>>(
               listener: (context, state) {
-                // يمكنك إضافة منطق للاستماع هنا، مثل عرض رسائل خطأ أو تنبيهات
+                // You can add listening logic here, such as displaying error messages or alerts
               },
               builder: (context, state) {
                 return state.when(
@@ -241,14 +233,14 @@ class _SearchPageState extends State<SearchPage> {
                         final student = displayedStudents[index];
                         final bool isExpanded = _expandedCards.contains(index);
 
-                        // التأكد من عدم وجود قيم null للأسماء والحالات للعرض
+                        // Ensure no null values for names and statuses for display
                         final String studentClassName =
                             student.className ?? "UnKonown";
                         final String studentStatus = student.inactive == 1
                             ? "Active"
                             : "InActive";
-                        final String studentSection = student.gradeName ??=
-                            "unKnown";
+                        final String studentSection =
+                            student.gradeName ?? "unKnown";
 
                         return Card(
                           color: Colors.grey.shade100,
@@ -283,7 +275,7 @@ class _SearchPageState extends State<SearchPage> {
                                       CircleAvatar(
                                         radius: 25,
                                         backgroundColor:
-                                            Colors.green, // خلفية افتراضية
+                                            Colors.green, // Default background
                                         child:
                                             (student.profilePicture != null &&
                                                 student
@@ -301,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
                                                         error,
                                                         stackTrace,
                                                       ) {
-                                                        // في حالة فشل تحميل الصورة، عرض أيقونة شخص
+                                                        // In case of image load failure, show person icon
                                                         return const Icon(
                                                           Icons.person,
                                                           color: Colors.white,
@@ -349,7 +341,6 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                     ],
                                   ),
-
                                   if (isExpanded)
                                     Column(
                                       children: [
@@ -358,7 +349,6 @@ class _SearchPageState extends State<SearchPage> {
                                           thickness: 1,
                                           color: Colors.grey,
                                         ),
-
                                         _buildDetailRow(
                                           "Score",
                                           "${student.score ?? 0}",
@@ -395,7 +385,6 @@ class _SearchPageState extends State<SearchPage> {
                                           "assets/images/studentLevel.png",
                                         ),
                                         const SizedBox(height: 10),
-
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -493,7 +482,6 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 60),
         ],
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

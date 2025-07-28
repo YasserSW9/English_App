@@ -18,22 +18,17 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
   String _selectedGradeFilter = 'All';
 
   // قوائم القيم الفريدة للفئات والدرجات لملء الـ Dropdowns
-  List<String> _uniqueClassNames = ['All'];
-  List<String> _uniqueGradeNames = ['All'];
-
-  // بما أننا لا نعتمد على gClassId، يمكن إزالة _gradeNameToIdMap
-  // final Map<String, int> _gradeNameToIdMap = {
-  //   'Temporary': 1,
-  //   'Grade 7': 2,
-  //   'Grade 8': 3,
-  //   'Grade 9': 4,
-  //   'Grade 10': 5,
-  // };
+  List<String> _uniqueClassNames = ['All']; // هذه ستتغير بناءً على الدرجة
+  List<String> _uniqueGradeNames = ['All']; // هذه ثابتة بعد التحميل الأولي
 
   ClassCubit(this._classRepo) : super(const ClassState.initial());
 
   List<String> get uniqueClassNames => _uniqueClassNames;
   List<String> get uniqueGradeNames => _uniqueGradeNames;
+  String get selectedClassFilter =>
+      _selectedClassFilter; // Getter للقيمة المختارة
+  String get selectedGradeFilter =>
+      _selectedGradeFilter; // Getter للقيمة المختارة
 
   Future<void> emitGetClassesLoaded() async {
     emit(const ClassState.loading());
@@ -50,8 +45,7 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     response.when(
       success: (classResponse) {
         _allStudents.clear();
-        Set<String> tempClassNames = {'All'}; // لتخزين الفئات الفريدة
-        Set<String> tempGradeNames = {'All'}; // لتخزين الدرجات الفريدة
+        Set<String> allUniqueGradeNames = {'All'}; // لجمع كل الدرجات من البداية
 
         if (classResponse.data != null) {
           print(
@@ -63,18 +57,9 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
                 if (classItem.students != null) {
                   _allStudents.addAll(classItem.students!);
                   for (var student in classItem.students!) {
-                    // جمع أسماء الفئات والدرجات الفريدة
-                    if (student.className != null &&
-                        student.className!.isNotEmpty) {
-                      tempClassNames.add(
-                        student.className!.trim(),
-                      ); // إضافة قيمة مُهذبة
-                    }
                     if (student.gradeName != null &&
                         student.gradeName!.isNotEmpty) {
-                      tempGradeNames.add(
-                        student.gradeName!.trim(),
-                      ); // إضافة قيمة مُهذبة
+                      allUniqueGradeNames.add(student.gradeName!.trim());
                     }
                   }
                 }
@@ -83,18 +68,21 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
           }
         }
 
-        _uniqueClassNames = tempClassNames.toList()..sort();
-        _uniqueGradeNames = tempGradeNames.toList()..sort();
-
+        _uniqueGradeNames = allUniqueGradeNames.toList()..sort();
         print(
           'ClassCubit: Initial _allStudents collected: ${_allStudents.length} students.',
         );
-        print('ClassCubit: Unique Class Names found: $_uniqueClassNames');
-        print('ClassCubit: Unique Grade Names found: $_uniqueGradeNames');
+        print(
+          'ClassCubit: Unique Grade Names found (initial): $_uniqueGradeNames',
+        );
 
         // تعيين الفلاتر الأولية (الافتراضية)
-        _selectedClassFilter = 'All';
         _selectedGradeFilter = 'All';
+        _selectedClassFilter = 'All';
+
+        // بعد جلب كل الطلاب وتحديد الدرجات الفريدة
+        // يجب أن نحسب الفئات المتاحة بناءً على الدرجة الافتراضية ("All")
+        _recalculateUniqueClassNamesForSelectedGrade(); // يحسب الفئات المتاحة لـ "All" الدرجات
 
         // تطبيق الفلاتر الأولية وعرض جميع الطلاب
         _applyFiltersInternal();
@@ -126,21 +114,61 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     );
   }
 
+  // هذه الدالة هي التي ستستقبل التغييرات من الـ UI
   void applyFilters({String? selectedClass, String? selectedGrade}) {
     print(
       'ClassCubit: Applying filters. Class: $selectedClass, Grade: $selectedGrade',
     );
+
+    // إذا تغيرت الدرجة، يجب إعادة حساب الفئات المتاحة وتعيين الفئة إلى "All"
+    bool gradeChanged = false;
+    if (selectedGrade != null && _selectedGradeFilter != selectedGrade) {
+      _selectedGradeFilter = selectedGrade;
+      _selectedClassFilter = 'All'; // إعادة تعيين الفئة عند تغيير الدرجة
+      gradeChanged = true;
+    }
+
     if (selectedClass != null) {
       _selectedClassFilter = selectedClass;
     }
-    if (selectedGrade != null) {
-      _selectedGradeFilter = selectedGrade;
+
+    // إعادة حساب الفئات المتاحة إذا تغيرت الدرجة
+    if (gradeChanged) {
+      _recalculateUniqueClassNamesForSelectedGrade();
     }
 
     _applyFiltersInternal();
     emit(ClassState.success(_displayedStudents));
     print(
       'ClassCubit: Filters applied. Displayed students: ${_displayedStudents.length}',
+    );
+  }
+
+  // دالة جديدة لإعادة حساب الفئات الفريدة بناءً على الدرجة المختارة
+  void _recalculateUniqueClassNamesForSelectedGrade() {
+    Set<String> tempClassNames = {'All'};
+
+    // الخطوة 1: فلترة الطلاب بناءً على الدرجة المختارة فقط
+    List<Students> studentsMatchingGrade = _allStudents.where((student) {
+      if (_selectedGradeFilter == 'All') {
+        return true; // إذا كانت الدرجة "All"، لا نفلتر حسب الدرجة هنا
+      }
+      final String studentGradeName =
+          student.gradeName?.trim().toLowerCase() ?? '';
+      final String filterGradeName = _selectedGradeFilter.trim().toLowerCase();
+      return studentGradeName == filterGradeName;
+    }).toList();
+
+    // الخطوة 2: جمع الفئات الفريدة من الطلاب الذين يطابقون الدرجة
+    for (var student in studentsMatchingGrade) {
+      if (student.className != null && student.className!.isNotEmpty) {
+        tempClassNames.add(student.className!.trim());
+      }
+    }
+
+    _uniqueClassNames = tempClassNames.toList()..sort();
+    print(
+      'ClassCubit: Recalculated unique class names for grade "$_selectedGradeFilter": $_uniqueClassNames',
     );
   }
 
@@ -166,7 +194,7 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       );
     }
 
-    // 2. تطبيق فلتر الدرجة (Grade) باستخدام gradeName مباشرةً
+    // 2. تطبيق فلتر الدرجة (Grade)
     if (_selectedGradeFilter != 'All') {
       tempStudents = tempStudents.where((student) {
         final String studentGradeName =
@@ -182,7 +210,7 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       );
     }
 
-    // 3. تطبيق فلتر الفئة (Class / Section) باستخدام className مباشرةً
+    // 3. تطبيق فلتر الفئة (Class / Section)
     if (_selectedClassFilter != 'All') {
       tempStudents = tempStudents.where((student) {
         final String studentClassName =
