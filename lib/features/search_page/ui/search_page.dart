@@ -14,7 +14,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final Set<int> _expandedCards = {}; // لتتبع حالة توسيع البطاقات
+  final Set<int> _expandedCards = {};
 
   String _selectedClassFilter = 'All';
   String _selectedGradeFilter = 'All';
@@ -42,14 +42,19 @@ class _SearchPageState extends State<SearchPage> {
         _selectedClassFilter = 'All';
       } else if (_selectedGradeFilter == 'Grade 7') {
         _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
+      } else if (_selectedGradeFilter == 'Grade 8') {
+        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
+      } else if (_selectedGradeFilter == 'Grade 9') {
+        _currentClassOptions = ['sec1', 'sec2', 'sec3', 'sec4'];
+      } else if (_selectedGradeFilter == 'Grade 10') {
+        _currentClassOptions = ['sec1'];
 
         if (!_currentClassOptions.contains(_selectedClassFilter)) {
           _selectedClassFilter = _currentClassOptions.first;
         }
       } else {
-        // للدرجات الأخرى (8, 9, 10) أو أي حالة غير محددة، عرض جميع الخيارات الممكنة
         _currentClassOptions = ['All', 'temp1', "sec1", "sec2", "sec3", "sec4"];
-        // إذا كانت الفئة المختارة حاليًا غير موجودة، أعد تعيينها إلى 'All'
+
         if (!_currentClassOptions.contains(_selectedClassFilter)) {
           _selectedClassFilter = 'All';
         }
@@ -88,7 +93,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              // فلاتر القوائم المنسدلة (Class و Grade)
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -107,36 +112,28 @@ class _SearchPageState extends State<SearchPage> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            value:
-                                _selectedClassFilter, // القيمة الحالية المختارة للفئة
+                            value: _selectedClassFilter,
                             icon: const Icon(
                               Icons.arrow_drop_down,
                               color: Colors.black,
                             ),
-                            items:
-                                _currentClassOptions // استخدام الخيارات الديناميكية للفئات
-                                    .map<DropdownMenuItem<String>>((
-                                      String value,
-                                    ) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 8.0,
-                                          ),
-                                          child: Text(
-                                            value,
-                                          ), // عرض قيمة الفئة مباشرةً
-                                        ),
-                                      );
-                                    })
-                                    .toList(),
+                            items: _currentClassOptions
+                                .map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(value),
+                                    ),
+                                  );
+                                })
+                                .toList(),
                             onChanged: (String? newValue) {
                               if (newValue != null) {
                                 setState(() {
                                   _selectedClassFilter = newValue;
                                 });
-                                // تطبيق الفلتر على الـ Cubit مباشرة
+
                                 classCubit.applyFilters(
                                   selectedClass: newValue,
                                   selectedGrade: _selectedGradeFilter,
@@ -249,17 +246,17 @@ class _SearchPageState extends State<SearchPage> {
                         String displayedGradeName =
                             student.gradeName ?? "غير معروف";
                         // يمكنك استخدام gClassId لتعيين اسم الدرجة بشكل أكثر دقة إذا كان gradeName غير متوفر
-                        if (student.gClassId == 1) {
-                          displayedGradeName = 'Temporary';
-                        } else if (student.gClassId == 2) {
-                          displayedGradeName = 'Grade 7';
-                        } else if (student.gClassId == 3) {
-                          displayedGradeName = 'Grade 8';
-                        } else if (student.gClassId == 4) {
-                          displayedGradeName = 'Grade 9';
-                        } else if (student.gClassId == 5) {
-                          displayedGradeName = 'Grade 10';
-                        }
+                        // if (student.gClassId == 1) {
+                        //   displayedGradeName = 'Temporary';
+                        // } else if (student.gClassId == 2) {
+                        //   displayedGradeName = 'Grade 7';
+                        // } else if (student.gClassId == 3) {
+                        //   displayedGradeName = 'Grade 8';
+                        // } else if (student.gClassId == 4) {
+                        //   displayedGradeName = 'Grade 9';
+                        // } else if (student.gClassId == 5) {
+                        //   displayedGradeName = 'Grade 10';
+                        // }
 
                         // التأكد من عدم وجود قيم null للأسماء والحالات للعرض
                         final String studentClassName =
@@ -267,6 +264,8 @@ class _SearchPageState extends State<SearchPage> {
                         final String studentStatus = student.inactive == 1
                             ? "Active"
                             : "InActive";
+                        final String studentSection = student.gradeName ??=
+                            "unKnown";
 
                         return Card(
                           color: Colors.grey.shade100,
@@ -351,7 +350,7 @@ class _SearchPageState extends State<SearchPage> {
                                               ),
                                             ),
                                             Text(
-                                              '$studentClassName \\ $displayedGradeName \\ $studentStatus',
+                                              '$studentClassName \\ $studentSection \\ $studentStatus',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey[900],
