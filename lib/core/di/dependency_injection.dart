@@ -25,6 +25,8 @@ import 'package:english_app/features/profile_page/logic/cubit/delete_admin_cubit
 import 'package:english_app/features/admin_main_screen/logic/cubit/notifications_cubit.dart';
 import 'package:english_app/features/login/data/repos/login_repo.dart';
 import 'package:english_app/features/login/logic/cubit/login_cubit.dart';
+import 'package:english_app/features/search_page/data/repos/class_repo.dart';
+import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/story_details/data/repos/story_repo.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
 import 'package:english_app/features/student_prizes/data/repos/prizes_repo.dart';
@@ -98,4 +100,7 @@ Future<void> setupGetIt() async {
   // get story details
   getIt.registerLazySingleton<StoryRepo>(() => StoryRepo(getIt()));
   getIt.registerFactory<StoryCubit>(() => StoryCubit(getIt()));
+  // get classes
+  getIt.registerLazySingleton<ClassRepo>(() => ClassRepo(getIt()));
+  getIt.registerFactory<ClassCubit>(() => ClassCubit(getIt()));
 }

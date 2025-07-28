@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names, unreachable_switch_case, non_constant_identifier_names
+
 import 'package:dio/dio.dart';
 import 'package:english_app/core/networking/api_contants.dart';
 import 'api_error_model.dart';

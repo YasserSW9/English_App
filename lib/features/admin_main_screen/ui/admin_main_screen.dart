@@ -2,7 +2,6 @@
 import 'package:english_app/features/profile_page/ui/profile_page.dart';
 import 'package:english_app/features/search_page/ui/search_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'widgets/custom_app_bar.dart';
 import 'widgets/custom_bottom_navigation_bar.dart';
 import 'widgets/notifications_page_content.dart';
@@ -15,7 +14,7 @@ class AdminMainScreen extends StatefulWidget {
 }
 
 class _AdminMainScreenState extends State<AdminMainScreen> {
-  int _currentBottomNavIndex = 0;
+  int _currentBottomNavIndex = 1;
   bool _snackBarShown = false;
 
   final List<Widget> _bottomNavPages = [

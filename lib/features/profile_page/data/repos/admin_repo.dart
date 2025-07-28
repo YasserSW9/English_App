@@ -1,4 +1,3 @@
-// lib/features/admin_main_screen/data/repos/admin_repo.dart
 import 'package:english_app/core/networking/api_error_handler.dart';
 import 'package:english_app/core/networking/api_result.dart';
 import 'package:english_app/core/networking/api_service.dart';
@@ -9,7 +8,6 @@ class AdminRepo {
 
   AdminRepo(this._apiService);
 
-  // تغيير نوع الإرجاع ليصبح قائمة من AdminResponse
   Future<ApiResult<List<AdminResponse>>> getAdminData() async {
     try {
       final response = await _apiService.getAdminData();

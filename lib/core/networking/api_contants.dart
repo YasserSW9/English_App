@@ -21,6 +21,8 @@ class ApiConstants {
   static const String createSection = "admin/sections";
   static const String getSection = "student/sections";
   static const String getStory = "admin/story/{tory_id}";
+  static const String getClassesData =
+      "admin/students?start_date={startDate}&end_date={endDate}";
 
   static List<String> wisdoms = [
     'Learning is a journey, not a destination. Embrace the process and be patient with yourself along the way.',

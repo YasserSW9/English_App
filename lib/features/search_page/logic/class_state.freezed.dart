@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'login_state.dart';
+part of 'class_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,7 +12,7 @@ part of 'login_state.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$LoginState<T> {
+mixin _$ClassState<T> {
 
 
 
@@ -20,7 +20,7 @@ mixin _$LoginState<T> {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState<T>);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClassState<T>);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginState<$T>()';
+  return 'ClassState<$T>()';
 }
 
 
 }
 
 /// @nodoc
-class $LoginStateCopyWith<T,$Res>  {
-$LoginStateCopyWith(LoginState<T> _, $Res Function(LoginState<T>) __);
+class $ClassStateCopyWith<T,$Res>  {
+$ClassStateCopyWith(ClassState<T> _, $Res Function(ClassState<T>) __);
 }
 
 
-/// Adds pattern-matching-related methods to [LoginState].
-extension LoginStatePatterns<T> on LoginState<T> {
+/// Adds pattern-matching-related methods to [ClassState].
+extension ClassStatePatterns<T> on ClassState<T> {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -192,7 +192,7 @@ return error(_that.error);case _:
 /// @nodoc
 
 
-class _Initial<T> implements LoginState<T> {
+class _Initial<T> implements ClassState<T> {
   const _Initial();
   
 
@@ -212,7 +212,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginState<$T>.initial()';
+  return 'ClassState<$T>.initial()';
 }
 
 
@@ -224,7 +224,7 @@ String toString() {
 /// @nodoc
 
 
-class Loading<T> implements LoginState<T> {
+class Loading<T> implements ClassState<T> {
   const Loading();
   
 
@@ -244,7 +244,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginState<$T>.loading()';
+  return 'ClassState<$T>.loading()';
 }
 
 
@@ -256,13 +256,13 @@ String toString() {
 /// @nodoc
 
 
-class Success<T> implements LoginState<T> {
+class Success<T> implements ClassState<T> {
   const Success(this.data);
   
 
  final  T data;
 
-/// Create a copy of LoginState
+/// Create a copy of ClassState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -281,14 +281,14 @@ int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(
 
 @override
 String toString() {
-  return 'LoginState<$T>.success(data: $data)';
+  return 'ClassState<$T>.success(data: $data)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SuccessCopyWith<T,$Res> implements $LoginStateCopyWith<T, $Res> {
+abstract mixin class $SuccessCopyWith<T,$Res> implements $ClassStateCopyWith<T, $Res> {
   factory $SuccessCopyWith(Success<T> value, $Res Function(Success<T>) _then) = _$SuccessCopyWithImpl;
 @useResult
 $Res call({
@@ -307,7 +307,7 @@ class _$SuccessCopyWithImpl<T,$Res>
   final Success<T> _self;
   final $Res Function(Success<T>) _then;
 
-/// Create a copy of LoginState
+/// Create a copy of ClassState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? data = freezed,}) {
   return _then(Success<T>(
@@ -322,13 +322,13 @@ as T,
 /// @nodoc
 
 
-class Error<T> implements LoginState<T> {
+class Error<T> implements ClassState<T> {
   const Error({required this.error});
   
 
  final  String error;
 
-/// Create a copy of LoginState
+/// Create a copy of ClassState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -347,14 +347,14 @@ int get hashCode => Object.hash(runtimeType,error);
 
 @override
 String toString() {
-  return 'LoginState<$T>.error(error: $error)';
+  return 'ClassState<$T>.error(error: $error)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ErrorCopyWith<T,$Res> implements $LoginStateCopyWith<T, $Res> {
+abstract mixin class $ErrorCopyWith<T,$Res> implements $ClassStateCopyWith<T, $Res> {
   factory $ErrorCopyWith(Error<T> value, $Res Function(Error<T>) _then) = _$ErrorCopyWithImpl;
 @useResult
 $Res call({
@@ -373,7 +373,7 @@ class _$ErrorCopyWithImpl<T,$Res>
   final Error<T> _self;
   final $Res Function(Error<T>) _then;
 
-/// Create a copy of LoginState
+/// Create a copy of ClassState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
   return _then(Error<T>(

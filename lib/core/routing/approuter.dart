@@ -6,6 +6,7 @@ import 'package:english_app/features/add_students_manually/ui/add_students_manua
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/english_club/ui/english_club.dart';
+import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
 import 'package:english_app/features/story_details/ui/story_details%20.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_grades_cubit.dart';
@@ -52,6 +53,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => getIt<ClassCubit>()),
               BlocProvider(create: (context) => getIt<NotificationsCubit>()),
               BlocProvider(create: (context) => getIt<AdminCubit>()),
               BlocProvider(create: (context) => getIt<DeleteAdminCubit>()),
