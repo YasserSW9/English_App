@@ -11,4 +11,5 @@ class Routes {
   static const String manageGradesAndClassess = '/manageGradesAndClassess';
   static const String roadMap = '/roadMap';
   static const String storyDetails = '/storyDetails';
+  static const String levelControlPanel = '/levelControlPanel';
 }

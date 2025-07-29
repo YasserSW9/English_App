@@ -9,9 +9,20 @@ class DateFilterDialog extends StatefulWidget {
 class _DateFilterDialogState extends State<DateFilterDialog> {
   DateTime? _startDate;
   DateTime? _endDate;
+  String? _selectedFilterType = 'no filter';
 
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
+
+  final List<String> _filterOptions = const [
+    'no filter',
+    'Score',
+    'GoldenCoins',
+    'SilverCoins',
+    'BronzeCoins',
+    'FinishedStories',
+    'FinishedLevels',
+  ];
 
   @override
   void dispose() {
@@ -45,7 +56,7 @@ class _DateFilterDialogState extends State<DateFilterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("filter by the date"),
+      title: const Text("Filter Options"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -72,6 +83,22 @@ class _DateFilterDialogState extends State<DateFilterDialog> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _selectedFilterType,
+            decoration: const InputDecoration(
+              labelText: 'Filter Type',
+              border: OutlineInputBorder(),
+            ),
+            items: _filterOptions.map((String value) {
+              return DropdownMenuItem<String>(value: value, child: Text(value));
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedFilterType = newValue;
+              });
+            },
+          ),
         ],
       ),
       actions: [
@@ -79,15 +106,17 @@ class _DateFilterDialogState extends State<DateFilterDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text("cancel"),
+          child: const Text("Cancel"),
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.of(
-              context,
-            ).pop({'startDate': _startDate, 'endDate': _endDate});
+            Navigator.of(context).pop({
+              'startDate': _startDate,
+              'endDate': _endDate,
+              'filterType': _selectedFilterType,
+            });
           },
-          child: const Text("Filter"),
+          child: const Text("Apply Filters"),
         ),
       ],
     );

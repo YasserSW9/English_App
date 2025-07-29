@@ -122,6 +122,9 @@ class AppRouter {
             child: StoryDetails(storyId: storyId),
           ),
         );
+      case Routes.levelControlPanel:
+        return MaterialPageRoute(builder: (_) => RoadMap());
+
       default:
         return null;
     }

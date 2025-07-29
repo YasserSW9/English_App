@@ -1,4 +1,5 @@
 // lib/features/search_page/ui/search_page.dart
+import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
@@ -21,8 +22,6 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
 
-    // Initial load of classes without specific date filters,
-    // it will use the default dates set in the cubit.
     context.read<ClassCubit>().emitGetClassesLoaded();
   }
 
@@ -46,7 +45,8 @@ class _SearchPageState extends State<SearchPage> {
           Column(
             children: [
               Container(
-                color: Colors.deepPurpleAccent.shade100,
+                height: 50,
+                color: Colors.deepPurpleAccent,
                 width: double.infinity,
                 child: const Center(
                   child: Text(
@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
@@ -69,7 +69,7 @@ class _SearchPageState extends State<SearchPage> {
                         height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: Colors.deepPurple,
                             width: 1,
@@ -125,7 +125,7 @@ class _SearchPageState extends State<SearchPage> {
                         height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: Colors.deepPurple,
                             width: 1,
@@ -186,7 +186,6 @@ class _SearchPageState extends State<SearchPage> {
                 },
                 hintText: 'Search',
                 onFilterPressed: () async {
-                  // This is where the DateFilterDialog is called
                   final Map<String, dynamic>? result = await showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -194,24 +193,17 @@ class _SearchPageState extends State<SearchPage> {
                     },
                   );
 
-                  // After the dialog closes, process the selected dates
                   if (result != null &&
                       result['startDate'] != null &&
                       result['endDate'] != null) {
                     final DateTime startDate = result['startDate'];
                     final DateTime endDate = result['endDate'];
 
-                    print('Start Date selected: $startDate');
-                    print('End Date selected: $endDate');
-
-                    // Pass these DateTime objects to ClassCubit to apply the date filter.
                     classCubit.updateDateRange(
                       startDate: startDate,
                       endDate: endDate,
                     );
                   }
-                  // If the dialog was canceled or no dates were selected, no action is needed here,
-                  // as updateDateRange already triggers a data reload.
                 },
               ),
               const SizedBox(height: 15),
@@ -234,7 +226,6 @@ class _SearchPageState extends State<SearchPage> {
                     }
 
                     return ListView.builder(
-                      padding: EdgeInsets.zero,
                       itemCount: displayedStudents.length,
                       itemBuilder: (BuildContext context, int index) {
                         final student = displayedStudents[index];
@@ -248,200 +239,207 @@ class _SearchPageState extends State<SearchPage> {
                         final String studentSection =
                             student.gradeName ?? "unKnown";
 
-                        return Card(
-                          color: Colors.grey.shade100,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 17.0,
-                            vertical: 15,
-                          ),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                if (isExpanded) {
-                                  _expandedCards.remove(index);
-                                } else {
-                                  _expandedCards.add(index);
-                                }
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 5.0,
-                                horizontal: 10.0,
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 25,
-                                        backgroundColor: Colors.green,
-                                        child:
-                                            (student.profilePicture != null &&
-                                                student
-                                                    .profilePicture!
-                                                    .isNotEmpty)
-                                            ? ClipOval(
-                                                child: Image.network(
-                                                  student.profilePicture!,
-                                                  fit: BoxFit.cover,
-                                                  width: 50,
-                                                  height: 50,
-                                                  errorBuilder:
-                                                      (
-                                                        context,
-                                                        error,
-                                                        stackTrace,
-                                                      ) {
-                                                        return const Icon(
-                                                          Icons.person,
-                                                          color: Colors.white,
-                                                          size: 30,
-                                                        );
-                                                      },
-                                                ),
-                                              )
-                                            : const Icon(
-                                                Icons.person,
-                                                color: Colors.white,
-                                                size: 30,
-                                              ),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              student.name ??
-                                                  "Student Name Not Available",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                            Text(
-                                              '$studentClassName \\ $studentSection \\ $studentStatus',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey[900],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Icon(
-                                        isExpanded
-                                            ? Icons.keyboard_arrow_up
-                                            : Icons.keyboard_arrow_down,
-                                        color: Colors.black87,
-                                      ),
-                                    ],
-                                  ),
-                                  if (isExpanded)
-                                    Column(
+                        return Dismissible(
+                          key: GlobalKey(),
+                          child: Card(
+                            color: Colors.grey.shade100,
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 17.0,
+                              vertical: 15,
+                            ),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  if (isExpanded) {
+                                    _expandedCards.remove(index);
+                                  } else {
+                                    _expandedCards.add(index);
+                                  }
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5.0,
+                                  horizontal: 10.0,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
                                       children: [
-                                        const Divider(
-                                          height: 20,
-                                          thickness: 1,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildDetailRow(
-                                          "Score",
-                                          "${student.score ?? 0}",
-                                          "assets/images/studentScore.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Golden cards",
-                                          "${student.goldenCoins ?? 0}",
-                                          "assets/images/golden.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Silver cards",
-                                          "${student.silverCoins ?? 0}",
-                                          "assets/images/silver.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Bronze cards",
-                                          "${student.bronzeCoins ?? 0}",
-                                          "assets/images/bronze.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Limit borrow books",
-                                          "${student.borrowLimit ?? 0}",
-                                          "assets/images/borrowBook.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Finished stories",
-                                          "${student.finishedStoriesCount ?? 0}",
-                                          "assets/images/finishedStudentStories.png",
-                                        ),
-                                        _buildDetailRow(
-                                          "Finished Levels",
-                                          "${student.finishedLevelsCount ?? 0}",
-                                          "assets/images/studentLevel.png",
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                print(
-                                                  'Update button pressed for ${student.name}',
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    Colors.deepPurple,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                        CircleAvatar(
+                                          radius: 25,
+                                          backgroundColor: Colors.green,
+                                          child:
+                                              (student.profilePicture != null &&
+                                                  student
+                                                      .profilePicture!
+                                                      .isNotEmpty)
+                                              ? ClipOval(
+                                                  child: Image.network(
+                                                    "${ApiConstants.imageUrl}${student.profilePicture!}",
+                                                    fit: BoxFit.cover,
+                                                    width: 50,
+                                                    height: 50,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return const Icon(
+                                                            Icons.person,
+                                                            color: Colors.white,
+                                                            size: 30,
+                                                          );
+                                                        },
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.person,
+                                                  color: Colors.white,
+                                                  size: 30,
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 30,
-                                                      vertical: 10,
-                                                    ),
-                                              ),
-                                              child: const Text('Update'),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                print(
-                                                  'Road Map button pressed for ${student.name}',
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    Colors.deepPurple,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                        ),
+                                        const SizedBox(width: 15),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                student.name ??
+                                                    "Student Name Not Available",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black87,
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 30,
-                                                      vertical: 10,
-                                                    ),
                                               ),
-                                              child: const Text('road map'),
-                                            ),
-                                          ],
+                                              Text(
+                                                '$studentClassName \\ $studentSection \\ $studentStatus',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[900],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Icon(
+                                          isExpanded
+                                              ? Icons.keyboard_arrow_up
+                                              : Icons.keyboard_arrow_down,
+                                          color: Colors.black87,
                                         ),
                                       ],
                                     ),
-                                ],
+                                    if (isExpanded)
+                                      Column(
+                                        children: [
+                                          const Divider(
+                                            height: 20,
+                                            thickness: 1,
+                                            color: Colors.grey,
+                                          ),
+                                          _buildDetailRow(
+                                            "Score",
+                                            "${student.score ?? 0}",
+                                            "assets/images/studentScore.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Golden cards",
+                                            "${student.goldenCoins ?? 0}",
+                                            "assets/images/golden.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Silver cards",
+                                            "${student.silverCoins ?? 0}",
+                                            "assets/images/silver.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Bronze cards",
+                                            "${student.bronzeCoins ?? 0}",
+                                            "assets/images/bronze.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Limit borrow books",
+                                            "${student.borrowLimit ?? 0}",
+                                            "assets/images/borrowBook.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Finished stories",
+                                            "${student.finishedStoriesCount ?? 0}",
+                                            "assets/images/finishedStudentStories.png",
+                                          ),
+                                          _buildDetailRow(
+                                            "Finished Levels",
+                                            "${student.finishedLevelsCount ?? 0}",
+                                            "assets/images/studentLevel.png",
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  print(
+                                                    'Update button pressed for ${student.name}',
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.deepPurple,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 10,
+                                                      ),
+                                                ),
+                                                child: const Text('Update'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  print(
+                                                    'Road Map button pressed for ${student.name}',
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.deepPurple,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 10,
+                                                      ),
+                                                ),
+                                                child: const Text('road map'),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -483,7 +481,6 @@ class _SearchPageState extends State<SearchPage> {
               },
             ),
           ),
-          const SizedBox(height: 60),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

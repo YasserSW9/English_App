@@ -92,8 +92,8 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       ),
       btnCancelOnPress: () {
-        createAdminCubit.nameController.clear(); // Clear cubit's controller
-        // Dismiss the dialog using its specific context
+        createAdminCubit.nameController.clear();
+
         if (_dialogContext != null && Navigator.of(_dialogContext!).canPop()) {
           Navigator.of(_dialogContext!).pop();
         }
@@ -123,9 +123,8 @@ class _ProfilePageState extends State<ProfilePage> {
       animType: AnimType.rightSlide,
       title: 'Confirm Deletion',
       desc: 'Are you sure you want to delete $adminName?',
-      btnCancelOnPress: () {}, // Do nothing on cancel
+      btnCancelOnPress: () {},
       btnOkOnPress: () {
-        // Trigger the delete operation using DeleteAdminCubit
         context.read<DeleteAdminCubit>().emitDeleteAdminLoaded(adminId);
       },
       btnOkText: 'Delete',
@@ -146,7 +145,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         children: [
           SizedBox(height: 20),
-          // Wrap AddAdminButton with BlocListener for CreateAdminCubit
+
           BlocListener<CreateAdminCubit, CreateAdminState>(
             listener: (context, state) {
               state.whenOrNull(
@@ -157,16 +156,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 success: (createAdminResponse) {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  // Extract username and password
+
                   final String? username =
                       createAdminResponse.data?.account?.username;
                   final String? password =
                       createAdminResponse.data?.account?.password;
 
-                  // Show AwesomeDialog with username and password
                   AwesomeDialog(
-                    context:
-                        context, // Use the main context for this new dialog
+                    context: context,
                     dialogType: DialogType.success,
                     animType: AnimType.scale,
                     title: 'Admin Created Successfully!',
@@ -174,16 +171,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         'Username: ${username ?? 'N/A'}\nPassword: ${password ?? 'N/A'}',
                     btnOkText: 'OK',
                     btnOkColor: Colors.green,
-                    btnOkOnPress: () {
-                      // No action needed here, just dismiss
-                    },
+                    btnOkOnPress: () {},
                   ).show();
 
-                  // Refresh the admin list after successful creation
                   context.read<AdminCubit>().emitGetAdminData();
-                  // Clear the text field after successful creation
+
                   context.read<CreateAdminCubit>().nameController.clear();
-                  // Dismiss the initial dialog after successful creation using its specific context
+
                   if (_dialogContext != null &&
                       Navigator.of(_dialogContext!).canPop()) {
                     Navigator.of(_dialogContext!).pop();
@@ -197,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       backgroundColor: Colors.red,
                     ),
                   );
-                  // Dismiss the dialog even on error using its specific context
+
                   if (_dialogContext != null &&
                       Navigator.of(_dialogContext!).canPop()) {
                     Navigator.of(_dialogContext!).pop();
@@ -211,7 +205,6 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: BlocConsumer<AdminCubit, AdminState>(
               listener: (context, state) {
-                // Listener for AdminCubit's errors
                 state.whenOrNull(
                   error: (error) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -238,8 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     if (admins.isEmpty) {
                       return const Center(child: Text('No admins found.'));
                     }
-                    // ✅ BlocListener for DeleteAdminCubit is placed here,
-                    // as it only needs to react to delete states without rebuilding the whole list.
+
                     return BlocListener<DeleteAdminCubit, DeleteAdminState>(
                       listener: (context, deleteState) {
                         deleteState.whenOrNull(
@@ -279,12 +271,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         itemCount: admins.length,
                         itemBuilder: (context, i) {
                           final String adminName = admins[i].name ?? 'N/A';
-                          final String adminId =
-                              admins[i].id.toString() ??
-                              ''; // Assuming sId is the admin ID
+                          final String adminId = admins[i].id.toString() ?? '';
                           return AdminListItem(
                             adminName: adminName,
-                            // Pass both ID and Name to the confirmation dialog
+
                             onDelete: () =>
                                 _confirmDeleteAdmin(adminId, adminName),
                           );

@@ -1,5 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:english_app/core/helpers/extensions.dart';
+import 'package:english_app/core/networking/api_contants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
@@ -96,8 +97,8 @@ class _StoryDetailsState extends State<StoryDetails> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Image.network(
-                                    story.coverUrl ??
-                                        'assets/images/bookCover.jpg',
+                                    "${ApiConstants.imageUrl}${story.coverUrl!}",
+
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
@@ -182,7 +183,11 @@ class _StoryDetailsState extends State<StoryDetails> {
                                                 ),
                                               ),
                                               TextButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  print(
+                                                    " ${ApiConstants.imageUrl}${story.coverUrl}",
+                                                  );
+                                                },
                                                 child: Text(
                                                   "Download",
                                                   style: TextStyle(

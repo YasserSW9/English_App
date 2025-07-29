@@ -1,4 +1,5 @@
 // lib/features/prizes/ui/widgets/prize_avatar.dart
+import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/features/student_prizes/ui/widgets/shimmer_loading_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,7 +18,7 @@ class PrizeAvatar extends StatelessWidget {
 
     if (hasValidImageUrl) {
       avatarContent = Image.network(
-        profilePictureUrl!,
+        "${ApiConstants.imageUrl}${profilePictureUrl!}",
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           debugPrint(

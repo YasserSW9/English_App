@@ -1,5 +1,6 @@
 // english_app.dart
 import 'package:english_app/core/helpers/extensions.dart';
+import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/core/routing/routes.dart';
 
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
@@ -58,7 +59,7 @@ class _EnglishclubState extends State<Englishclub> {
                     dialogType: DialogType.error,
                     animType: AnimType.rightSlide,
                     title: 'Error!',
-                    desc: 'Failed to load sections: $error', // عرض الخطأ هنا
+                    desc: 'Failed to load sections: $error',
                     btnOkOnPress: () {},
                   ).show();
                 },
@@ -223,30 +224,39 @@ class _EnglishclubState extends State<Englishclub> {
 
                                 return Column(
                                   children: [
-                                    Container(
-                                      width: double.infinity,
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 15,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          subDataItem.name
-                                                  ?.split('/')
-                                                  .first
-                                                  .trim() ??
-                                              'Sub-Section Name N/A',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                    InkWell(
+                                      onTap: () {
+                                        context.pushNamed(
+                                          Routes.levelControlPanel,
+                                        );
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 15,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            subDataItem.name
+                                                    ?.split('/')
+                                                    .first
+                                                    .trim() ??
+                                                'Sub-Section Name N/A',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -360,22 +370,22 @@ class _EnglishclubState extends State<Englishclub> {
                                                                       color: Colors
                                                                           .grey,
                                                                       child: Image.network(
+                                                                        "${ApiConstants.imageUrl}${story.coverUrl!}",
                                                                         fit: BoxFit
                                                                             .cover,
-                                                                        story
-                                                                            .coverUrl!,
+
                                                                         // ! TODO FIX THE COVER ISSUE
-                                                                        // errorBuilder:
-                                                                        //     (
-                                                                        //       context,
-                                                                        //       error,
-                                                                        //       stackTrace,
-                                                                        //     ) => const Image(
-                                                                        //       image: AssetImage(
-                                                                        //         "assets/images/bookCover.jpg",
-                                                                        //       ),
-                                                                        //       fit: BoxFit.cover,
-                                                                        //     ),
+                                                                        errorBuilder:
+                                                                            (
+                                                                              context,
+                                                                              error,
+                                                                              stackTrace,
+                                                                            ) => const Image(
+                                                                              image: AssetImage(
+                                                                                "assets/images/bookCover.jpg",
+                                                                              ),
+                                                                              fit: BoxFit.cover,
+                                                                            ),
                                                                       ),
                                                                     ),
                                                                   ),

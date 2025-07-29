@@ -10,18 +10,15 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
   final ClassRepo _classRepo;
   TextEditingController searchController = TextEditingController();
 
-  List<Students> _allStudents = []; // جميع الطلاب من الـ API
-  List<Students> _displayedStudents = []; // الطلاب بعد الفلاتر والبحث
+  List<Students> _allStudents = [];
+  List<Students> _displayedStudents = [];
 
-  // قيم الفلاتر المختارة
   String _selectedClassFilter = 'All';
   String _selectedGradeFilter = 'All';
 
-  // قوائم القيم الفريدة للفئات والدرجات لملء الـ Dropdowns
-  List<String> _uniqueClassNames = ['All']; // هذه ستتغير بناءً على الدرجة
-  List<String> _uniqueGradeNames = ['All']; // هذه ثابتة بعد التحميل الأولي
+  List<String> _uniqueClassNames = ['All'];
+  List<String> _uniqueGradeNames = ['All'];
 
-  // تواريخ الفلترة الحالية
   DateTime? _currentStartDate;
   DateTime? _currentEndDate;
 
@@ -29,10 +26,8 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
 
   List<String> get uniqueClassNames => _uniqueClassNames;
   List<String> get uniqueGradeNames => _uniqueGradeNames;
-  String get selectedClassFilter =>
-      _selectedClassFilter; // Getter للقيمة المختارة
-  String get selectedGradeFilter =>
-      _selectedGradeFilter; // Getter للقيمة المختارة
+  String get selectedClassFilter => _selectedClassFilter;
+  String get selectedGradeFilter => _selectedGradeFilter;
 
   Future<void> emitGetClassesLoaded({
     DateTime? startDate,
@@ -41,13 +36,9 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     emit(const ClassState.loading());
     print('ClassCubit: Starting emitGetClassesLoaded...');
 
-    // استخدام التواريخ الجديدة إذا تم توفيرها، وإلا استخدام التواريخ الحالية أو الافتراضية
-    // الافتراضي هو 11/4/2023 و 11/4/2024 كما كان في الكود الأصلي، ولكن الآن كـ DateTime
-    _currentStartDate = startDate ?? _currentStartDate ?? DateTime(2023, 4, 11);
-    _currentEndDate = endDate ?? _currentEndDate ?? DateTime(2024, 4, 11);
+    _currentStartDate = startDate ?? _currentStartDate ?? DateTime(2024, 4, 11);
+    _currentEndDate = endDate ?? _currentEndDate ?? DateTime(2025, 4, 11);
 
-    // تحويل تواريخ DateTime إلى String بالصيغة المطلوبة (YYYY-MM-DD هو الأفضل للـ API عادةً)
-    // تأكد أن هذا يتطابق مع ما يتوقعه الـ API الخاص بك
     final String formattedStartDate =
         "${_currentStartDate!.year}-${_currentStartDate!.month.toString().padLeft(2, '0')}-${_currentStartDate!.day.toString().padLeft(2, '0')}";
     final String formattedEndDate =
@@ -61,7 +52,7 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     response.when(
       success: (classResponse) {
         _allStudents.clear();
-        Set<String> allUniqueGradeNames = {'All'}; // لجمع كل الدرجات من البداية
+        Set<String> allUniqueGradeNames = {'All'};
 
         if (classResponse.data != null) {
           print(
@@ -92,15 +83,11 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
           'ClassCubit: Unique Grade Names found (initial): $_uniqueGradeNames',
         );
 
-        // تعيين الفلاتر الأولية (الافتراضية)
         _selectedGradeFilter = 'All';
         _selectedClassFilter = 'All';
 
-        // بعد جلب كل الطلاب وتحديد الدرجات الفريدة
-        // يجب أن نحسب الفئات المتاحة بناءً على الدرجة الافتراضية ("All")
-        _recalculateUniqueClassNamesForSelectedGrade(); // يحسب الفئات المتاحة لـ "All" الدرجات
+        _recalculateUniqueClassNamesForSelectedGrade();
 
-        // تطبيق الفلاتر الأولية وعرض جميع الطلاب
         _applyFiltersInternal();
         emit(ClassState.success(_displayedStudents));
         print(
@@ -120,14 +107,13 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     );
   }
 
-  // دالة عامة لتحديث نطاق التاريخ
   void updateDateRange({
     required DateTime? startDate,
     required DateTime? endDate,
   }) {
     _currentStartDate = startDate;
     _currentEndDate = endDate;
-    // إعادة تحميل البيانات باستخدام التواريخ الجديدة
+
     emitGetClassesLoaded(
       startDate: _currentStartDate,
       endDate: _currentEndDate,
@@ -144,17 +130,15 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     );
   }
 
-  // هذه الدالة هي التي ستستقبل التغييرات من الـ UI
   void applyFilters({String? selectedClass, String? selectedGrade}) {
     print(
       'ClassCubit: Applying filters. Class: $selectedClass, Grade: $selectedGrade',
     );
 
-    // إذا تغيرت الدرجة، يجب إعادة حساب الفئات المتاحة وتعيين الفئة إلى "All"
     bool gradeChanged = false;
     if (selectedGrade != null && _selectedGradeFilter != selectedGrade) {
       _selectedGradeFilter = selectedGrade;
-      _selectedClassFilter = 'All'; // إعادة تعيين الفئة عند تغيير الدرجة
+      _selectedClassFilter = 'All';
       gradeChanged = true;
     }
 
@@ -162,7 +146,6 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       _selectedClassFilter = selectedClass;
     }
 
-    // إعادة حساب الفئات المتاحة إذا تغيرت الدرجة
     if (gradeChanged) {
       _recalculateUniqueClassNamesForSelectedGrade();
     }
@@ -174,14 +157,12 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     );
   }
 
-  // دالة جديدة لإعادة حساب الفئات الفريدة بناءً على الدرجة المختارة
   void _recalculateUniqueClassNamesForSelectedGrade() {
     Set<String> tempClassNames = {'All'};
 
-    // الخطوة 1: فلترة الطلاب بناءً على الدرجة المختارة فقط
     List<Students> studentsMatchingGrade = _allStudents.where((student) {
       if (_selectedGradeFilter == 'All') {
-        return true; // إذا كانت الدرجة "All"، لا نفلتر حسب الدرجة هنا
+        return true;
       }
       final String studentGradeName =
           student.gradeName?.trim().toLowerCase() ?? '';
@@ -189,7 +170,6 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       return studentGradeName == filterGradeName;
     }).toList();
 
-    // الخطوة 2: جمع الفئات الفريدة من الطلاب الذين يطابقون الدرجة
     for (var student in studentsMatchingGrade) {
       if (student.className != null && student.className!.isNotEmpty) {
         tempClassNames.add(student.className!.trim());
@@ -208,7 +188,6 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     );
     List<Students> tempStudents = List.from(_allStudents);
 
-    // 1. تطبيق فلتر البحث
     if (searchController.text.isNotEmpty) {
       final String lowerCaseQuery = searchController.text.toLowerCase();
       tempStudents = tempStudents.where((student) {
@@ -224,7 +203,6 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       );
     }
 
-    // 2. تطبيق فلتر الدرجة (Grade)
     if (_selectedGradeFilter != 'All') {
       tempStudents = tempStudents.where((student) {
         final String studentGradeName =
@@ -240,7 +218,6 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
       );
     }
 
-    // 3. تطبيق فلتر الفئة (Class / Section)
     if (_selectedClassFilter != 'All') {
       tempStudents = tempStudents.where((student) {
         final String studentClassName =
