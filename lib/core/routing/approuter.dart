@@ -8,6 +8,7 @@ import 'package:english_app/features/english_club/logic/english_club_cubit.dart'
 import 'package:english_app/features/english_club/ui/english_club.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
+import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
 import 'package:english_app/features/story_details/ui/story_details%20.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_grades_cubit.dart';
@@ -60,6 +61,7 @@ class AppRouter {
               BlocProvider(create: (context) => getIt<DeleteAdminCubit>()),
               BlocProvider(create: (context) => getIt<CreateAdminCubit>()),
               BlocProvider(create: (context) => getIt<DeleteStudentCubit>()),
+              BlocProvider(create: (context) => getIt<InactiveStudentCubit>()),
             ],
             child: AdminMainScreen(),
           ),

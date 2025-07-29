@@ -1,5 +1,5 @@
 import 'package:english_app/core/networking/api_contants.dart';
-import 'package:english_app/features/search_page/data/models/class_response.dart';
+import 'package:english_app/features/search_page/data/models/class_response.dart'; //
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
@@ -9,7 +9,11 @@ import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.da
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // تأكد من إضافة هذه المكتبة إذا كنت تستخدمها
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:english_app/features/search_page/logic/inactive_student_state.dart';
+import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
+import 'package:english_app/features/search_page/data/models/inactive_response.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -218,333 +222,420 @@ class _SearchPageState extends State<SearchPage> {
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   success: (displayedStudents) {
-                    return BlocConsumer<DeleteStudentCubit, DeleteStudentState>(
-                      listener: (context, deleteState) {
-                        deleteState.whenOrNull(
-                          loading: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Deleting student...'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                          success: (data) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  data.message ??
-                                      'Student deleted successfully!',
-                                ),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-
-                            context.read<ClassCubit>().emitGetClassesLoaded();
-                          },
-                          error: (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error deleting student: $error'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      builder: (context, deleteState) {
-                        if (displayedStudents.isEmpty) {
-                          return const Center(
-                            child: Text("No Students Data To Show"),
-                          );
-                        }
-                        return ListView.builder(
-                          itemCount: displayedStudents.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final student = displayedStudents[index];
-                            final bool isExpanded = _expandedCards.contains(
-                              index,
-                            );
-                            final String studentClassName =
-                                student.className ?? "UnKonown";
-                            final String studentStatus = student.inactive == 1
-                                ? "Active"
-                                : "InActive";
-                            final String studentSection =
-                                student.gradeName ?? "unKnown";
-
-                            return Slidable(
-                              key: ValueKey(student.id),
-                              startActionPane: ActionPane(
-                                motion: const ScrollMotion(),
-                                extentRatio: 0.30,
-                                children: [
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      print(
-                                        'Scan Book action for ${student.name}',
-                                      );
-                                    },
-                                    backgroundColor: Colors.brown,
-                                    foregroundColor: Colors.white,
-                                    icon: Icons.qr_code_scanner,
-                                    label: 'Scan Book',
+                    return MultiBlocListener(
+                      listeners: [
+                        BlocListener<DeleteStudentCubit, DeleteStudentState>(
+                          listener: (context, deleteState) {
+                            deleteState.whenOrNull(
+                              loading: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Deleting student...'),
+                                    duration: Duration(seconds: 1),
                                   ),
-                                ],
-                              ),
-                              endActionPane: ActionPane(
-                                motion: const ScrollMotion(),
-                                extentRatio: 0.5,
-                                children: [
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      if (student.id != null) {
-                                        context
-                                            .read<DeleteStudentCubit>()
-                                            .emitDeleteStudent(
-                                              student.id!.toString(),
-                                            );
-                                      } else {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Student ID is missing!',
-                                            ),
-                                            backgroundColor: Colors.orange,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    icon: Icons.delete,
-                                    label: 'Delete',
-                                  ),
-                                  SlidableAction(
-                                    onPressed: (context) {},
-                                    backgroundColor: Colors.blue,
-                                    foregroundColor: Colors.white,
-                                    icon: Icons.person_off,
-                                    label: 'Inactive',
-                                  ),
-                                ],
-                              ),
-                              child: Card(
-                                color: Colors.grey.shade100,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: 17.0.w,
-                                  vertical: 15.h,
-                                ),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  side: BorderSide(color: Colors.grey.shade300),
-                                ),
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      if (isExpanded) {
-                                        _expandedCards.remove(index);
-                                      } else {
-                                        _expandedCards.add(index);
-                                      }
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 5.0.h,
-                                      horizontal: 10.0.w,
+                                );
+                              },
+                              success: (data) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      data.message ??
+                                          'Student deleted successfully!',
                                     ),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 25.r,
-                                              backgroundColor: Colors.green,
-                                              child:
-                                                  (student.profilePicture !=
-                                                          null &&
-                                                      student
-                                                          .profilePicture!
-                                                          .isNotEmpty)
-                                                  ? ClipOval(
-                                                      child: Image.network(
-                                                        "${ApiConstants.imageUrl}${student.profilePicture!}",
-                                                        fit: BoxFit.cover,
-                                                        width: 50.w,
-                                                        height: 50.h,
-                                                        errorBuilder:
-                                                            (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              return Icon(
-                                                                Icons.person,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 30.sp,
-                                                              );
-                                                            },
-                                                      ),
-                                                    )
-                                                  : Icon(
-                                                      Icons.person,
-                                                      color: Colors.white,
-                                                      size: 30.sp,
-                                                    ),
-                                            ),
-                                            SizedBox(width: 15.w),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    student.name ??
-                                                        "Student Name Not Available",
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.black87,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '$studentClassName \\ $studentSection \\ $studentStatus',
-                                                    style: TextStyle(
-                                                      fontSize: 12.sp,
-                                                      color: Colors.grey[900],
-                                                    ),
-                                                  ),
-                                                ],
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                context
+                                    .read<ClassCubit>()
+                                    .emitGetClassesLoaded();
+                              },
+                              error: (error) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Error deleting student: $error',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        BlocListener<
+                          InactiveStudentCubit,
+                          InactiveStudentState<InactiveResponse>
+                        >(
+                          listener: (context, inactiveState) {
+                            inactiveState.whenOrNull(
+                              loading: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Updating student status...'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              success: (data) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      data.message ??
+                                          'Student status updated successfully!',
+                                    ),
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                );
+                                context
+                                    .read<ClassCubit>()
+                                    .emitGetClassesLoaded();
+                              },
+                              error: (error) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Error updating student status: $error',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                      child: Builder(
+                        builder: (context) {
+                          if (displayedStudents.isEmpty) {
+                            return const Center(
+                              child: Text("No Students Data To Show"),
+                            );
+                          }
+                          return ListView.builder(
+                            itemCount: displayedStudents.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final student = displayedStudents[index]; //
+                              final bool isExpanded = _expandedCards.contains(
+                                index,
+                              );
+                              final String studentClassName =
+                                  student.className ?? "UnKonown"; //
+
+                              final String displayStatus = student.inactive == 1
+                                  ? "Active"
+                                  : "Inactive"; //
+
+                              final String studentSection =
+                                  student.gradeName ?? "unKnown"; //
+
+                              return Slidable(
+                                key: ValueKey(student.id), //
+                                endActionPane: ActionPane(
+                                  motion: const ScrollMotion(),
+                                  extentRatio: 0.30,
+                                  children: [
+                                    SlidableAction(
+                                      borderRadius: BorderRadius.circular(30),
+                                      onPressed: (context) {
+                                        // Scan Book action
+                                      },
+                                      backgroundColor: Colors.brown,
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.qr_code_scanner,
+                                      label: 'Scan Book',
+                                    ),
+                                  ],
+                                ),
+                                startActionPane: ActionPane(
+                                  motion: const ScrollMotion(),
+                                  extentRatio: 0.5,
+                                  children: [
+                                    SlidableAction(
+                                      borderRadius: BorderRadius.circular(30),
+                                      onPressed: (context) {
+                                        if (student.id != null) {
+                                          //
+                                          context
+                                              .read<DeleteStudentCubit>()
+                                              .emitDeleteStudent(
+                                                student.id!.toString(), //
+                                              );
+                                        } else {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Student ID is missing!',
                                               ),
+                                              backgroundColor: Colors.orange,
                                             ),
-                                            Icon(
-                                              isExpanded
-                                                  ? Icons.keyboard_arrow_up
-                                                  : Icons.keyboard_arrow_down,
-                                              color: Colors.black87,
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.delete,
+                                      label: 'Delete',
+                                    ),
+                                    SlidableAction(
+                                      borderRadius: BorderRadius.circular(30),
+                                      onPressed: (context) {
+                                        if (student.id != null) {
+                                          final int newActiveStatusForApi =
+                                              student.inactive == 1 ? 0 : 1; //
+
+                                          context
+                                              .read<InactiveStudentCubit>()
+                                              .emitMarkStudentActiveOrInactive(
+                                                studentId: student.id!, //
+                                                newActiveStatus:
+                                                    newActiveStatusForApi,
+                                              );
+                                        } else {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Student ID is missing for status update!',
+                                              ),
+                                              backgroundColor: Colors.orange,
                                             ),
-                                          ],
-                                        ),
-                                        if (isExpanded)
-                                          Column(
+                                          );
+                                        }
+                                      },
+
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      icon: student.inactive == 1
+                                          ? Icons.person_off
+                                          : Icons.person_add, //
+                                      label: student.inactive == 1
+                                          ? 'Inactive'
+                                          : 'Activate', //
+                                    ),
+                                  ],
+                                ),
+                                child: Card(
+                                  color: Colors.grey.shade100,
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: 17.0.w,
+                                    vertical: 15.h,
+                                  ),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    side: BorderSide(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        if (isExpanded) {
+                                          _expandedCards.remove(index);
+                                        } else {
+                                          _expandedCards.add(index);
+                                        }
+                                      });
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 5.0.h,
+                                        horizontal: 10.0.w,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Row(
                                             children: [
-                                              Divider(
-                                                height: 20.h,
-                                                thickness: 1.w,
-                                                color: Colors.grey,
-                                              ),
-                                              _buildDetailRow(
-                                                "Score",
-                                                "${student.score ?? 0}",
-                                                "assets/images/studentScore.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Golden cards",
-                                                "${student.goldenCoins ?? 0}",
-                                                "assets/images/golden.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Silver cards",
-                                                "${student.silverCoins ?? 0}",
-                                                "assets/images/silver.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Bronze cards",
-                                                "${student.bronzeCoins ?? 0}",
-                                                "assets/images/bronze.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Limit borrow books",
-                                                "${student.borrowLimit ?? 0}",
-                                                "assets/images/borrowBook.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Finished stories",
-                                                "${student.finishedStoriesCount ?? 0}",
-                                                "assets/images/finishedStudentStories.png",
-                                              ),
-                                              _buildDetailRow(
-                                                "Finished Levels",
-                                                "${student.finishedLevelsCount ?? 0}",
-                                                "assets/images/studentLevel.png",
-                                              ),
-                                              SizedBox(height: 10.h),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      print(
-                                                        'Update button pressed for ${student.name}',
-                                                      );
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          Colors.deepPurple,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10.r,
-                                                            ),
+                                              CircleAvatar(
+                                                radius: 25.r,
+                                                backgroundColor: Colors.green,
+                                                child:
+                                                    (student.profilePicture !=
+                                                            null &&
+                                                        student
+                                                            .profilePicture!
+                                                            .isNotEmpty) //
+                                                    ? ClipOval(
+                                                        child: Image.network(
+                                                          "${ApiConstants.imageUrl}${student.profilePicture!}", //
+                                                          fit: BoxFit.cover,
+                                                          width: 50.w,
+                                                          height: 50.h,
+                                                          errorBuilder:
+                                                              (
+                                                                context,
+                                                                error,
+                                                                stackTrace,
+                                                              ) {
+                                                                return Icon(
+                                                                  Icons.person,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 30.sp,
+                                                                );
+                                                              },
+                                                        ),
+                                                      )
+                                                    : Icon(
+                                                        Icons.person,
+                                                        color: Colors.white,
+                                                        size: 30.sp,
                                                       ),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                            horizontal: 30.w,
-                                                            vertical: 10.h,
-                                                          ),
-                                                    ),
-                                                    child: const Text('Update'),
-                                                  ),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      print(
-                                                        'Road Map button pressed for ${student.name}',
-                                                      );
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          Colors.deepPurple,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10.r,
-                                                            ),
+                                              ),
+                                              SizedBox(width: 15.w),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      student.name ??
+                                                          "Student Name Not Available", //
+                                                      style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.black87,
                                                       ),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                            horizontal: 30.w,
-                                                            vertical: 10.h,
-                                                          ),
                                                     ),
-                                                    child: const Text(
-                                                      'road map',
+                                                    Text(
+                                                      '$studentClassName \\ $studentSection \\ $displayStatus', // استخدام displayStatus المعدلة
+                                                      style: TextStyle(
+                                                        fontSize: 12.sp,
+                                                        color: Colors.grey[900],
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
+                                              ),
+                                              Icon(
+                                                isExpanded
+                                                    ? Icons.keyboard_arrow_up
+                                                    : Icons.keyboard_arrow_down,
+                                                color: Colors.black87,
                                               ),
                                             ],
                                           ),
-                                      ],
+                                          if (isExpanded)
+                                            Column(
+                                              children: [
+                                                Divider(
+                                                  height: 20.h,
+                                                  thickness: 1.w,
+                                                  color: Colors.grey,
+                                                ),
+                                                _buildDetailRow(
+                                                  "Score",
+                                                  "${student.score ?? 0}", //
+                                                  "assets/images/studentScore.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Golden cards",
+                                                  "${student.goldenCoins ?? 0}", //
+                                                  "assets/images/golden.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Silver cards",
+                                                  "${student.silverCoins ?? 0}", //
+                                                  "assets/images/silver.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Bronze cards",
+                                                  "${student.bronzeCoins ?? 0}", //
+                                                  "assets/images/bronze.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Limit borrow books",
+                                                  "${student.borrowLimit ?? 0}", //
+                                                  "assets/images/borrowBook.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Finished stories",
+                                                  "${student.finishedStoriesCount ?? 0}", //
+                                                  "assets/images/finishedStudentStories.png",
+                                                ),
+                                                _buildDetailRow(
+                                                  "Finished Levels",
+                                                  "${student.finishedLevelsCount ?? 0}", //
+                                                  "assets/images/studentLevel.png",
+                                                ),
+                                                SizedBox(height: 10.h),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        print(
+                                                          'Update button pressed for ${student.name}',
+                                                        );
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.deepPurple,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10.r,
+                                                              ),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 30.w,
+                                                              vertical: 10.h,
+                                                            ),
+                                                      ),
+                                                      child: const Text(
+                                                        'Update',
+                                                      ),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        print(
+                                                          'Road Map button pressed for ${student.name}',
+                                                        );
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.deepPurple,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10.r,
+                                                              ),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 30.w,
+                                                              vertical: 10.h,
+                                                            ),
+                                                      ),
+                                                      child: const Text(
+                                                        'road map',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              );
+                            },
+                          );
+                        },
+                      ),
                     );
                   },
                   error: (error) {

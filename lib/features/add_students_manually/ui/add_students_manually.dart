@@ -116,9 +116,8 @@ class _AddStudentsManuallyState extends State<AddStudentsManually> {
         backgroundColor: const Color(0xFF673AB7),
       ),
       body: Container(
-        margin: const EdgeInsets.only(top: 20),
         padding: const EdgeInsets.all(25),
-        color: Colors.white,
+
         child: BlocListener<CreateStudentCubit, CreateStudentState>(
           listener: (context, state) {
             state.whenOrNull(

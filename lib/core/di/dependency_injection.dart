@@ -27,8 +27,10 @@ import 'package:english_app/features/login/data/repos/login_repo.dart';
 import 'package:english_app/features/login/logic/cubit/login_cubit.dart';
 import 'package:english_app/features/search_page/data/repos/class_repo.dart';
 import 'package:english_app/features/search_page/data/repos/delete_student_repo.dart';
+import 'package:english_app/features/search_page/data/repos/inactive_repo.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
+import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
 import 'package:english_app/features/story_details/data/repos/story_repo.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
 import 'package:english_app/features/student_prizes/data/repos/prizes_repo.dart';
@@ -110,4 +112,11 @@ Future<void> setupGetIt() async {
     () => DeleteStudentRepo(getIt()),
   );
   getIt.registerFactory<DeleteStudentCubit>(() => DeleteStudentCubit(getIt()));
+  // inactive student
+  getIt.registerLazySingleton<InactiveStudentRepo>(
+    () => InactiveStudentRepo(getIt()),
+  );
+  getIt.registerFactory<InactiveStudentCubit>(
+    () => InactiveStudentCubit(getIt()),
+  );
 }
