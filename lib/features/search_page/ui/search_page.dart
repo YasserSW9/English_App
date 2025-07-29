@@ -2,11 +2,14 @@ import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
+import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
+import 'package:english_app/features/search_page/logic/delete_student_state.dart';
 import 'package:english_app/features/search_page/ui/widgets/date_filter_dialog.dart';
 import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // تأكد من إضافة هذه المكتبة إذا كنت تستخدمها
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -43,34 +46,34 @@ class _SearchPageState extends State<SearchPage> {
           Column(
             children: [
               Container(
-                height: 50,
+                height: 50.h,
                 color: Colors.deepPurpleAccent,
                 width: double.infinity,
-                child: const Center(
+                child: Center(
                   child: Text(
                     'Search',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                 child: Row(
                   children: [
                     Expanded(
                       child: Container(
-                        height: 40,
+                        height: 40.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.deepPurple,
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
@@ -94,8 +97,8 @@ class _SearchPageState extends State<SearchPage> {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 8.0,
+                                              padding: EdgeInsets.only(
+                                                left: 8.0.w,
                                               ),
                                               child: Text(value),
                                             ),
@@ -117,16 +120,16 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10.w),
                     Expanded(
                       child: Container(
-                        height: 40,
+                        height: 40.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.deepPurple,
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
@@ -150,8 +153,8 @@ class _SearchPageState extends State<SearchPage> {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 8.0,
+                                              padding: EdgeInsets.only(
+                                                left: 8.0.w,
                                               ),
                                               child: Text(value),
                                             ),
@@ -175,7 +178,7 @@ class _SearchPageState extends State<SearchPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               // Search bar
               SearchBarWidget(
                 onChanged: (query) {
@@ -203,7 +206,7 @@ class _SearchPageState extends State<SearchPage> {
                   }
                 },
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 15.h),
             ],
           ),
           Expanded(
@@ -215,269 +218,331 @@ class _SearchPageState extends State<SearchPage> {
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   success: (displayedStudents) {
-                    if (displayedStudents.isEmpty) {
-                      return const Center(
-                        child: Text("No Students Data To Show"),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: displayedStudents.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final student = displayedStudents[index];
-                        final bool isExpanded = _expandedCards.contains(index);
-                        final String studentClassName =
-                            student.className ?? "UnKonown";
-                        final String studentStatus = student.inactive == 1
-                            ? "Active"
-                            : "InActive";
-                        final String studentSection =
-                            student.gradeName ?? "unKnown";
-
-                        return Slidable(
-                          key: ValueKey(student.id),
-
-                          startActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            extentRatio: 0.30,
-                            children: [
-                              SlidableAction(
-                                onPressed: (context) {
-                                  print('Scan Book action for ${student.name}');
-                                },
-                                backgroundColor: Colors.brown,
-                                foregroundColor: Colors.white,
-                                icon: Icons.qr_code_scanner,
-                                label: 'Scan Book',
+                    return BlocConsumer<DeleteStudentCubit, DeleteStudentState>(
+                      listener: (context, deleteState) {
+                        deleteState.whenOrNull(
+                          loading: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Deleting student...'),
+                                duration: Duration(seconds: 1),
                               ),
-                            ],
-                          ),
-
-                          endActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            extentRatio: 0.5,
-                            children: [
-                              SlidableAction(
-                                onPressed: (context) {
-                                  print('Delete action for ${student.name}');
-                                },
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                icon: Icons.delete,
-                                label: 'Delete',
-                              ),
-                              SlidableAction(
-                                onPressed: (context) {
-                                  print('Inactive action for ${student.name}');
-                                },
-                                backgroundColor: Colors.blue,
-                                foregroundColor: Colors.white,
-                                icon: Icons.person_off,
-                                label: 'Inactive',
-                              ),
-                            ],
-                          ),
-                          child: Card(
-                            color: Colors.grey.shade100,
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 17.0,
-                              vertical: 15,
-                            ),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(color: Colors.grey.shade300),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  if (isExpanded) {
-                                    _expandedCards.remove(index);
-                                  } else {
-                                    _expandedCards.add(index);
-                                  }
-                                });
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 5.0,
-                                  horizontal: 10.0,
+                            );
+                          },
+                          success: (data) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  data.message ??
+                                      'Student deleted successfully!',
                                 ),
-                                child: Column(
-                                  children: [
-                                    Row(
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+
+                            context.read<ClassCubit>().emitGetClassesLoaded();
+                          },
+                          error: (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error deleting student: $error'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      builder: (context, deleteState) {
+                        if (displayedStudents.isEmpty) {
+                          return const Center(
+                            child: Text("No Students Data To Show"),
+                          );
+                        }
+                        return ListView.builder(
+                          itemCount: displayedStudents.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final student = displayedStudents[index];
+                            final bool isExpanded = _expandedCards.contains(
+                              index,
+                            );
+                            final String studentClassName =
+                                student.className ?? "UnKonown";
+                            final String studentStatus = student.inactive == 1
+                                ? "Active"
+                                : "InActive";
+                            final String studentSection =
+                                student.gradeName ?? "unKnown";
+
+                            return Slidable(
+                              key: ValueKey(student.id),
+                              startActionPane: ActionPane(
+                                motion: const ScrollMotion(),
+                                extentRatio: 0.30,
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (context) {
+                                      print(
+                                        'Scan Book action for ${student.name}',
+                                      );
+                                    },
+                                    backgroundColor: Colors.brown,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.qr_code_scanner,
+                                    label: 'Scan Book',
+                                  ),
+                                ],
+                              ),
+                              endActionPane: ActionPane(
+                                motion: const ScrollMotion(),
+                                extentRatio: 0.5,
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (context) {
+                                      if (student.id != null) {
+                                        context
+                                            .read<DeleteStudentCubit>()
+                                            .emitDeleteStudent(
+                                              student.id!.toString(),
+                                            );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Student ID is missing!',
+                                            ),
+                                            backgroundColor: Colors.orange,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.delete,
+                                    label: 'Delete',
+                                  ),
+                                  SlidableAction(
+                                    onPressed: (context) {},
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.person_off,
+                                    label: 'Inactive',
+                                  ),
+                                ],
+                              ),
+                              child: Card(
+                                color: Colors.grey.shade100,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: 17.0.w,
+                                  vertical: 15.h,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  side: BorderSide(color: Colors.grey.shade300),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isExpanded) {
+                                        _expandedCards.remove(index);
+                                      } else {
+                                        _expandedCards.add(index);
+                                      }
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 5.0.h,
+                                      horizontal: 10.0.w,
+                                    ),
+                                    child: Column(
                                       children: [
-                                        CircleAvatar(
-                                          radius: 25,
-                                          backgroundColor: Colors.green,
-                                          child:
-                                              (student.profilePicture != null &&
-                                                  student
-                                                      .profilePicture!
-                                                      .isNotEmpty)
-                                              ? ClipOval(
-                                                  child: Image.network(
-                                                    "${ApiConstants.imageUrl}${student.profilePicture!}",
-                                                    fit: BoxFit.cover,
-                                                    width: 50,
-                                                    height: 50,
-                                                    errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) {
-                                                          return const Icon(
-                                                            Icons.person,
-                                                            color: Colors.white,
-                                                            size: 30,
-                                                          );
-                                                        },
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 25.r,
+                                              backgroundColor: Colors.green,
+                                              child:
+                                                  (student.profilePicture !=
+                                                          null &&
+                                                      student
+                                                          .profilePicture!
+                                                          .isNotEmpty)
+                                                  ? ClipOval(
+                                                      child: Image.network(
+                                                        "${ApiConstants.imageUrl}${student.profilePicture!}",
+                                                        fit: BoxFit.cover,
+                                                        width: 50.w,
+                                                        height: 50.h,
+                                                        errorBuilder:
+                                                            (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return Icon(
+                                                                Icons.person,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 30.sp,
+                                                              );
+                                                            },
+                                                      ),
+                                                    )
+                                                  : Icon(
+                                                      Icons.person,
+                                                      color: Colors.white,
+                                                      size: 30.sp,
+                                                    ),
+                                            ),
+                                            SizedBox(width: 15.w),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    student.name ??
+                                                        "Student Name Not Available",
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.black87,
+                                                    ),
                                                   ),
-                                                )
-                                              : const Icon(
-                                                  Icons.person,
-                                                  color: Colors.white,
-                                                  size: 30,
-                                                ),
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                student.name ??
-                                                    "Student Name Not Available",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black87,
-                                                ),
+                                                  Text(
+                                                    '$studentClassName \\ $studentSection \\ $studentStatus',
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      color: Colors.grey[900],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                '$studentClassName \\ $studentSection \\ $studentStatus',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey[900],
-                                                ),
+                                            ),
+                                            Icon(
+                                              isExpanded
+                                                  ? Icons.keyboard_arrow_up
+                                                  : Icons.keyboard_arrow_down,
+                                              color: Colors.black87,
+                                            ),
+                                          ],
+                                        ),
+                                        if (isExpanded)
+                                          Column(
+                                            children: [
+                                              Divider(
+                                                height: 20.h,
+                                                thickness: 1.w,
+                                                color: Colors.grey,
+                                              ),
+                                              _buildDetailRow(
+                                                "Score",
+                                                "${student.score ?? 0}",
+                                                "assets/images/studentScore.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Golden cards",
+                                                "${student.goldenCoins ?? 0}",
+                                                "assets/images/golden.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Silver cards",
+                                                "${student.silverCoins ?? 0}",
+                                                "assets/images/silver.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Bronze cards",
+                                                "${student.bronzeCoins ?? 0}",
+                                                "assets/images/bronze.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Limit borrow books",
+                                                "${student.borrowLimit ?? 0}",
+                                                "assets/images/borrowBook.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Finished stories",
+                                                "${student.finishedStoriesCount ?? 0}",
+                                                "assets/images/finishedStudentStories.png",
+                                              ),
+                                              _buildDetailRow(
+                                                "Finished Levels",
+                                                "${student.finishedLevelsCount ?? 0}",
+                                                "assets/images/studentLevel.png",
+                                              ),
+                                              SizedBox(height: 10.h),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      print(
+                                                        'Update button pressed for ${student.name}',
+                                                      );
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor:
+                                                          Colors.deepPurple,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10.r,
+                                                            ),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                            horizontal: 30.w,
+                                                            vertical: 10.h,
+                                                          ),
+                                                    ),
+                                                    child: const Text('Update'),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      print(
+                                                        'Road Map button pressed for ${student.name}',
+                                                      );
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor:
+                                                          Colors.deepPurple,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10.r,
+                                                            ),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                            horizontal: 30.w,
+                                                            vertical: 10.h,
+                                                          ),
+                                                    ),
+                                                    child: const Text(
+                                                      'road map',
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        Icon(
-                                          isExpanded
-                                              ? Icons.keyboard_arrow_up
-                                              : Icons.keyboard_arrow_down,
-                                          color: Colors.black87,
-                                        ),
                                       ],
                                     ),
-                                    if (isExpanded)
-                                      Column(
-                                        children: [
-                                          const Divider(
-                                            height: 20,
-                                            thickness: 1,
-                                            color: Colors.grey,
-                                          ),
-                                          _buildDetailRow(
-                                            "Score",
-                                            "${student.score ?? 0}",
-                                            "assets/images/studentScore.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Golden cards",
-                                            "${student.goldenCoins ?? 0}",
-                                            "assets/images/golden.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Silver cards",
-                                            "${student.silverCoins ?? 0}",
-                                            "assets/images/silver.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Bronze cards",
-                                            "${student.bronzeCoins ?? 0}",
-                                            "assets/images/bronze.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Limit borrow books",
-                                            "${student.borrowLimit ?? 0}",
-                                            "assets/images/borrowBook.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Finished stories",
-                                            "${student.finishedStoriesCount ?? 0}",
-                                            "assets/images/finishedStudentStories.png",
-                                          ),
-                                          _buildDetailRow(
-                                            "Finished Levels",
-                                            "${student.finishedLevelsCount ?? 0}",
-                                            "assets/images/studentLevel.png",
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  print(
-                                                    'Update button pressed for ${student.name}',
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.deepPurple,
-                                                  foregroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
-                                                        ),
-                                                  ),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 30,
-                                                        vertical: 10,
-                                                      ),
-                                                ),
-                                                child: const Text('Update'),
-                                              ),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  print(
-                                                    'Road Map button pressed for ${student.name}',
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.deepPurple,
-                                                  foregroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
-                                                        ),
-                                                  ),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 30,
-                                                        vertical: 10,
-                                                      ),
-                                                ),
-                                                child: const Text('road map'),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
                       },
                     );
@@ -487,21 +552,21 @@ class _SearchPageState extends State<SearchPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.error_outline,
                             color: Colors.red,
-                            size: 50,
+                            size: 50.sp,
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           Text(
                             'An error occurred: $error',
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.red,
-                              fontSize: 16,
+                              fontSize: 16.sp,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           ElevatedButton(
                             onPressed: () {
                               context.read<ClassCubit>().emitGetClassesLoaded();
@@ -531,20 +596,20 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildDetailRow(String label, String value, String iconPath) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0.h),
       child: Row(
         children: [
-          SizedBox(width: 24, height: 24, child: Image.asset(iconPath)),
-          const SizedBox(width: 10),
+          SizedBox(width: 24.w, height: 24.h, child: Image.asset(iconPath)),
+          SizedBox(width: 10.w),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: TextStyle(fontSize: 14.sp, color: Colors.black87),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+            style: TextStyle(fontSize: 14.sp, color: Colors.black87),
           ),
         ],
       ),
