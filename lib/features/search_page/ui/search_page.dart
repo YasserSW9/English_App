@@ -1,4 +1,3 @@
-// lib/features/search_page/ui/search_page.dart
 import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
@@ -7,6 +6,7 @@ import 'package:english_app/features/search_page/ui/widgets/date_filter_dialog.d
 import 'package:english_app/features/search_page/ui/widgets/search_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -21,13 +21,11 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-
     context.read<ClassCubit>().emitGetClassesLoaded();
   }
 
   void _updateFiltersAndDropdowns() {
     final ClassCubit classCubit = context.read<ClassCubit>();
-
     classCubit.applyFilters(
       selectedClass: classCubit.selectedClassFilter,
       selectedGrade: classCubit.selectedGradeFilter,
@@ -198,7 +196,6 @@ class _SearchPageState extends State<SearchPage> {
                       result['endDate'] != null) {
                     final DateTime startDate = result['startDate'];
                     final DateTime endDate = result['endDate'];
-
                     classCubit.updateDateRange(
                       startDate: startDate,
                       endDate: endDate,
@@ -209,7 +206,6 @@ class _SearchPageState extends State<SearchPage> {
               const SizedBox(height: 15),
             ],
           ),
-
           Expanded(
             child: BlocConsumer<ClassCubit, ClassState<List<Students>>>(
               listener: (context, state) {},
@@ -224,13 +220,11 @@ class _SearchPageState extends State<SearchPage> {
                         child: Text("No Students Data To Show"),
                       );
                     }
-
                     return ListView.builder(
                       itemCount: displayedStudents.length,
                       itemBuilder: (BuildContext context, int index) {
                         final student = displayedStudents[index];
                         final bool isExpanded = _expandedCards.contains(index);
-
                         final String studentClassName =
                             student.className ?? "UnKonown";
                         final String studentStatus = student.inactive == 1
@@ -239,8 +233,49 @@ class _SearchPageState extends State<SearchPage> {
                         final String studentSection =
                             student.gradeName ?? "unKnown";
 
-                        return Dismissible(
-                          key: GlobalKey(),
+                        return Slidable(
+                          key: ValueKey(student.id),
+
+                          startActionPane: ActionPane(
+                            motion: const ScrollMotion(),
+                            extentRatio: 0.30,
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) {
+                                  print('Scan Book action for ${student.name}');
+                                },
+                                backgroundColor: Colors.brown,
+                                foregroundColor: Colors.white,
+                                icon: Icons.qr_code_scanner,
+                                label: 'Scan Book',
+                              ),
+                            ],
+                          ),
+
+                          endActionPane: ActionPane(
+                            motion: const ScrollMotion(),
+                            extentRatio: 0.5,
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) {
+                                  print('Delete action for ${student.name}');
+                                },
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                icon: Icons.delete,
+                                label: 'Delete',
+                              ),
+                              SlidableAction(
+                                onPressed: (context) {
+                                  print('Inactive action for ${student.name}');
+                                },
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                icon: Icons.person_off,
+                                label: 'Inactive',
+                              ),
+                            ],
+                          ),
                           child: Card(
                             color: Colors.grey.shade100,
                             margin: const EdgeInsets.symmetric(

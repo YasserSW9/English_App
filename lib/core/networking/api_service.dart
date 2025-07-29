@@ -20,6 +20,7 @@ import 'package:english_app/features/admin_main_screen/data/models/notifications
 import 'package:english_app/features/login/data/models/login_request_body.dart';
 import 'package:english_app/features/login/data/models/login_response.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart';
+import 'package:english_app/features/search_page/data/models/delete_student_response.dart';
 import 'package:english_app/features/story_details/data/models/story_response.dart';
 import 'package:english_app/features/student_prizes/data/models/prizes_response.dart';
 import 'package:english_app/features/todo_tasks/data/models/collect_tasks.dart';
@@ -115,5 +116,10 @@ abstract class ApiService {
   Future<ClassResponse> getClasses(
     @Query("start_date") String startDate,
     @Query("end_date") String endDate,
+  );
+  // delete student
+  @DELETE("admin/students/{Delete_student_id}")
+  Future<DeleteStudentResponse> deleteStudent(
+    @Path("Delete_student_id") String deleteStudentId,
   );
 }
