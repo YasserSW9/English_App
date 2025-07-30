@@ -234,9 +234,8 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.error,
                     animType: AnimType.bottomSlide,
                     title: 'Error',
-                    desc:
-                        error ??
-                        'An unknown error occurred during grade update.',
+                    desc: error,
+
                     btnOkOnPress: () {},
                   ).show();
                 },
