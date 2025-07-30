@@ -10,6 +10,7 @@ import 'package:english_app/features/manage_grades_and_classes/data/models/creat
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_grade_request_body.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_grade_response.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/models/delete_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/delete_grade_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/edit_class_request_body.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/edit_class_response.dart';
@@ -144,5 +145,11 @@ abstract class ApiService {
   @POST("admin/classes")
   Future<CreateClassResponse> createClass(
     @Body() CreateClassRequestBody createClassRequestBody,
+  );
+  // delete class
+
+  @DELETE("admin/classes/{delete_class_id}")
+  Future<DeleteClassResponse> deleteClass(
+    @Path("delete_class_id") String deleteClassId,
   );
 }

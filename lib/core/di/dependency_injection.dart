@@ -9,12 +9,14 @@ import 'package:english_app/features/english_club/logic/create_section_cubit.dar
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_class_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_grade_repo.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/repos/delete_class_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/delete_grade_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/edit_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/edit_grade_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/grades_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_grades_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/delete_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/delete_grade_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_grade_cubit.dart';
@@ -129,4 +131,7 @@ Future<void> setupGetIt() async {
   // create class
   getIt.registerLazySingleton<CreateClassRepo>(() => CreateClassRepo(getIt()));
   getIt.registerFactory<CreateClassCubit>(() => CreateClassCubit(getIt()));
+  // delete class
+  getIt.registerLazySingleton<DeleteClassRepo>(() => DeleteClassRepo(getIt()));
+  getIt.registerFactory<DeleteClassCubit>(() => DeleteClassCubit(getIt()));
 }

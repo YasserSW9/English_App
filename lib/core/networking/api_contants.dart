@@ -27,6 +27,7 @@ class ApiConstants {
   static const String inactiveStudent = "admin/students/{student_id}/inActive";
   static const String editClass = "admin/classes/{class_id}";
   static const String createClass = "admin/classes";
+  static const String deleteClass = "admin/classes/{Delete_class_id}";
 
   static List<String> wisdoms = [
     'Learning is a journey, not a destination. Embrace the process and be patient with yourself along the way.',

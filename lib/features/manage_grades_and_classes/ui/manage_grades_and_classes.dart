@@ -1,4 +1,8 @@
 import 'package:english_app/features/manage_grades_and_classes/data/models/grades_response.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_state.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_state.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_grade_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_grade_state.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/grades_cubit.dart';
@@ -155,6 +159,92 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
             },
           ),
 
+          BlocListener<EditClassCubit, EditClassState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                loading: () {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.info,
+                    animType: AnimType.bottomSlide,
+                    title: 'Updating class',
+                    desc: 'Please wait...',
+                    autoHide: const Duration(seconds: 5),
+                    headerAnimationLoop: true,
+                  ).show();
+                },
+                success: (data) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.success,
+                    animType: AnimType.bottomSlide,
+                    title: 'Success!',
+                    desc: 'class updated successfully.',
+                    btnOkOnPress: () {
+                      context.read<GradesCubit>().emitGetGrades();
+                    },
+                  ).show();
+                },
+                error: (error) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.error,
+                    animType: AnimType.bottomSlide,
+                    title: 'Error',
+                    desc:
+                        error ??
+                        'An unknown error occurred during grade update.',
+                    btnOkOnPress: () {},
+                  ).show();
+                },
+              );
+            },
+          ),
+
+          /****** */
+          BlocListener<CreateClassCubit, CreateClassState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                loading: () {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.info,
+                    animType: AnimType.bottomSlide,
+                    title: 'Updating class',
+                    desc: 'Please wait...',
+                    autoHide: const Duration(seconds: 5),
+                    headerAnimationLoop: true,
+                  ).show();
+                },
+                success: (data) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.success,
+                    animType: AnimType.bottomSlide,
+                    title: 'Success!',
+                    desc: 'class updated successfully.',
+                    btnOkOnPress: () {
+                      context.read<GradesCubit>().emitGetGrades();
+                    },
+                  ).show();
+                },
+                error: (error) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.error,
+                    animType: AnimType.bottomSlide,
+                    title: 'Error',
+                    desc:
+                        error ??
+                        'An unknown error occurred during grade update.',
+                    btnOkOnPress: () {},
+                  ).show();
+                },
+              );
+            },
+          ),
+
+          /***** */
           BlocListener<DeleteGradeCubit, DeleteGradeState>(
             listener: (context, state) {
               state.whenOrNull(
