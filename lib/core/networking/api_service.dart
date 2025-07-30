@@ -6,9 +6,13 @@ import 'package:english_app/features/add_students_manually/data/models/create_st
 import 'package:english_app/features/english_club/data/models/create_section_request_body.dart';
 import 'package:english_app/features/english_club/data/models/create_section_response.dart';
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/models/create_class_request_body.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/models/create_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_grade_request_body.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_grade_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/delete_grade_response.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/models/edit_class_request_body.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/models/edit_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/edit_grade_request_body.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/edit_grade_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/grades_response.dart';
@@ -129,5 +133,16 @@ abstract class ApiService {
   Future<InactiveResponse> markStudentInactive(
     @Path("student_id") int studentId,
     @Body() InactiveRequestBody inactiveRequestBody,
+  );
+  // edit class
+  @PUT('admin/classes/{class_id}')
+  Future<EditClassResponse> editClass(
+    @Path("class_id") int classId,
+    @Body() EditClassRequestBody editClassRequestBody,
+  );
+  // create class
+  @POST("admin/classes")
+  Future<CreateClassResponse> createClass(
+    @Body() CreateClassRequestBody createClassRequestBody,
   );
 }

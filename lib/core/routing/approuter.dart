@@ -6,6 +6,8 @@ import 'package:english_app/features/add_students_manually/ui/add_students_manua
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/english_club/ui/english_club.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
 import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
@@ -108,6 +110,8 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => getIt<CreateClassCubit>()),
+              BlocProvider(create: (context) => getIt<EditClassCubit>()),
               BlocProvider(create: (context) => getIt<GradesCubit>()),
               BlocProvider(create: (context) => getIt<DeleteGradeCubit>()),
               BlocProvider(create: (context) => getIt<EditGradeCubit>()),

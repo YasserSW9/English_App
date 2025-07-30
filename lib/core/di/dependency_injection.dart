@@ -7,12 +7,16 @@ import 'package:english_app/features/english_club/data/repos/create_section_repo
 import 'package:english_app/features/english_club/data/repos/english_club_repo.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/repos/create_class_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_grade_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/delete_grade_repo.dart';
+import 'package:english_app/features/manage_grades_and_classes/data/repos/edit_class_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/edit_grade_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/grades_repo.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_grades_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/delete_grade_cubit.dart';
+import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_grade_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/grades_cubit.dart';
 import 'package:english_app/features/profile_page/data/repos/admin_repo.dart';
@@ -119,4 +123,10 @@ Future<void> setupGetIt() async {
   getIt.registerFactory<InactiveStudentCubit>(
     () => InactiveStudentCubit(getIt()),
   );
+  // edit class
+  getIt.registerLazySingleton<EditClassRepo>(() => EditClassRepo(getIt()));
+  getIt.registerFactory<EditClassCubit>(() => EditClassCubit(getIt()));
+  // create class
+  getIt.registerLazySingleton<CreateClassRepo>(() => CreateClassRepo(getIt()));
+  getIt.registerFactory<CreateClassCubit>(() => CreateClassCubit(getIt()));
 }
