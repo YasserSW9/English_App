@@ -210,7 +210,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     context: context,
                     dialogType: DialogType.info,
                     animType: AnimType.bottomSlide,
-                    title: 'Updating class',
+                    title: 'Creating Class', // تم التعديل
                     desc: 'Please wait...',
                     autoHide: const Duration(seconds: 5),
                     headerAnimationLoop: true,
@@ -222,7 +222,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.success,
                     animType: AnimType.bottomSlide,
                     title: 'Success!',
-                    desc: 'class updated successfully.',
+                    desc: 'Class created successfully.', // تم التعديل
                     btnOkOnPress: () {
                       context.read<GradesCubit>().emitGetGrades();
                     },
@@ -234,8 +234,9 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.error,
                     animType: AnimType.bottomSlide,
                     title: 'Error',
-                    desc: error,
-
+                    desc:
+                        error ??
+                        'An unknown error occurred during class creation.', // تم التعديل
                     btnOkOnPress: () {},
                   ).show();
                 },

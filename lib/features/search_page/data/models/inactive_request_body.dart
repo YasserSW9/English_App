@@ -4,9 +4,9 @@ part 'inactive_request_body.g.dart';
 
 @JsonSerializable()
 class InactiveRequestBody {
-  final int active; // تم حذف المتحول 'inactive'
+  final int active;
 
-  InactiveRequestBody({required this.active}); // تم تحديث الـ constructor
+  InactiveRequestBody({required this.active});
 
   Map<String, dynamic> toJson() => _$InactiveRequestBodyToJson(this);
 }
