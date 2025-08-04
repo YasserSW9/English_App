@@ -37,7 +37,7 @@ class ClassCubit extends Cubit<ClassState<List<Students>>> {
     print('ClassCubit: Starting emitGetClassesLoaded...');
 
     _currentStartDate = startDate ?? _currentStartDate ?? DateTime(2024, 4, 11);
-    _currentEndDate = endDate ?? _currentEndDate ?? DateTime(2025, 4, 11);
+    _currentEndDate = endDate ?? _currentEndDate ?? DateTime(2029, 4, 11);
 
     final String formattedStartDate =
         "${_currentStartDate!.year}-${_currentStartDate!.month.toString().padLeft(2, '0')}-${_currentStartDate!.day.toString().padLeft(2, '0')}";

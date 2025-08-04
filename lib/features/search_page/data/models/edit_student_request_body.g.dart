@@ -10,14 +10,14 @@ EditStudentRequestBody _$EditStudentRequestBodyFromJson(
   Map<String, dynamic> json,
 ) => EditStudentRequestBody(
   name: json['name'] as String,
-  gClassId: (json['gClassId'] as num).toInt(),
-  borrowLimit: (json['borrowLimit'] as num).toInt(),
+  gClassId: (json['g_class_id'] as num).toInt(),
+  borrowLimit: (json['borrow_limit'] as num).toInt(),
 );
 
 Map<String, dynamic> _$EditStudentRequestBodyToJson(
   EditStudentRequestBody instance,
 ) => <String, dynamic>{
   'name': instance.name,
-  'gClassId': instance.gClassId,
-  'borrowLimit': instance.borrowLimit,
+  'g_class_id': instance.gClassId,
+  'borrow_limit': instance.borrowLimit,
 };

@@ -1,6 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:english_app/core/networking/api_contants.dart';
-import 'package:english_app/features/search_page/data/models/class_response.dart'; //
+import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/class_state.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
@@ -16,6 +16,12 @@ import 'package:english_app/features/search_page/logic/inactive_student_state.da
 import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
 import 'package:english_app/features/search_page/data/models/inactive_response.dart';
 
+// Imports for Edit Student functionality
+import 'package:english_app/features/search_page/logic/edit_student_cubit.dart';
+import 'package:english_app/features/search_page/logic/edit_student_state.dart';
+import 'package:english_app/features/search_page/data/models/edit_student_request_body.dart';
+import 'package:english_app/features/search_page/data/models/edit_student_response.dart';
+
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -26,10 +32,22 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final Set<int> _expandedCards = {};
 
+  late TextEditingController _nameController;
+  late TextEditingController _borrowLimitController;
+
   @override
   void initState() {
     super.initState();
     context.read<ClassCubit>().emitGetClassesLoaded();
+    _nameController = TextEditingController();
+    _borrowLimitController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _borrowLimitController.dispose();
+    super.dispose();
   }
 
   void _updateFiltersAndDropdowns() {
@@ -304,6 +322,46 @@ class _SearchPageState extends State<SearchPage> {
                             );
                           },
                         ),
+                        BlocListener<EditStudentCubit, EditStudentState>(
+                          listener: (context, editState) {
+                            editState.whenOrNull(
+                              loading: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Updating student details...',
+                                    ),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              success: (data) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      (data as EditStudentResponse).message ??
+                                          'Student details updated successfully!',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                context
+                                    .read<ClassCubit>()
+                                    .emitGetClassesLoaded();
+                              },
+                              error: (error) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Error updating student details: $error',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ],
                       child: Builder(
                         builder: (context) {
@@ -315,22 +373,20 @@ class _SearchPageState extends State<SearchPage> {
                           return ListView.builder(
                             itemCount: displayedStudents.length,
                             itemBuilder: (BuildContext context, int index) {
-                              final student = displayedStudents[index]; //
+                              final student = displayedStudents[index];
                               final bool isExpanded = _expandedCards.contains(
                                 index,
                               );
                               final String studentClassName =
-                                  student.className ?? "UnKonown"; //
-
+                                  student.className ?? "UnKonown";
                               final String displayStatus = student.inactive == 1
                                   ? "Active"
-                                  : "Inactive"; //
-
+                                  : "Inactive";
                               final String studentSection =
-                                  student.gradeName ?? "unKnown"; //
+                                  student.gradeName ?? "unKnown";
 
                               return Slidable(
-                                key: ValueKey(student.id), //
+                                key: ValueKey(student.id),
                                 endActionPane: ActionPane(
                                   motion: const ScrollMotion(),
                                   extentRatio: 0.30,
@@ -355,11 +411,10 @@ class _SearchPageState extends State<SearchPage> {
                                       borderRadius: BorderRadius.circular(30),
                                       onPressed: (context) {
                                         if (student.id != null) {
-                                          //
                                           context
                                               .read<DeleteStudentCubit>()
                                               .emitDeleteStudent(
-                                                student.id!.toString(), //
+                                                student.id!.toString(),
                                               );
                                         } else {
                                           ScaffoldMessenger.of(
@@ -384,12 +439,11 @@ class _SearchPageState extends State<SearchPage> {
                                       onPressed: (context) {
                                         if (student.id != null) {
                                           final int newActiveStatusForApi =
-                                              student.inactive == 1 ? 0 : 1; //
-
+                                              student.inactive == 1 ? 0 : 1;
                                           context
                                               .read<InactiveStudentCubit>()
                                               .emitMarkStudentActiveOrInactive(
-                                                studentId: student.id!, //
+                                                studentId: student.id!,
                                                 newActiveStatus:
                                                     newActiveStatusForApi,
                                               );
@@ -406,15 +460,14 @@ class _SearchPageState extends State<SearchPage> {
                                           );
                                         }
                                       },
-
                                       backgroundColor: Colors.blue,
                                       foregroundColor: Colors.white,
                                       icon: student.inactive == 1
                                           ? Icons.person_off
-                                          : Icons.person_add, //
+                                          : Icons.person_add,
                                       label: student.inactive == 1
                                           ? 'Inactive'
-                                          : 'Activate', //
+                                          : 'Activate',
                                     ),
                                   ],
                                 ),
@@ -458,10 +511,10 @@ class _SearchPageState extends State<SearchPage> {
                                                             null &&
                                                         student
                                                             .profilePicture!
-                                                            .isNotEmpty) //
+                                                            .isNotEmpty)
                                                     ? ClipOval(
                                                         child: Image.network(
-                                                          "${ApiConstants.imageUrl}${student.profilePicture!}", //
+                                                          "${ApiConstants.imageUrl}${student.profilePicture!}",
                                                           fit: BoxFit.cover,
                                                           width: 50.w,
                                                           height: 50.h,
@@ -494,7 +547,7 @@ class _SearchPageState extends State<SearchPage> {
                                                   children: [
                                                     Text(
                                                       student.name ??
-                                                          "Student Name Not Available", //
+                                                          "Student Name Not Available",
                                                       style: TextStyle(
                                                         fontSize: 16.sp,
                                                         fontWeight:
@@ -503,7 +556,7 @@ class _SearchPageState extends State<SearchPage> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      '$studentClassName \\ $studentSection \\ $displayStatus', // استخدام displayStatus المعدلة
+                                                      '$studentClassName \\ $studentSection \\ $displayStatus',
                                                       style: TextStyle(
                                                         fontSize: 12.sp,
                                                         color: Colors.grey[900],
@@ -530,37 +583,37 @@ class _SearchPageState extends State<SearchPage> {
                                                 ),
                                                 _buildDetailRow(
                                                   "Score",
-                                                  "${student.score ?? 0}", //
+                                                  "${student.score ?? 0}",
                                                   "assets/images/studentScore.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Golden cards",
-                                                  "${student.goldenCoins ?? 0}", //
+                                                  "${student.goldenCoins ?? 0}",
                                                   "assets/images/golden.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Silver cards",
-                                                  "${student.silverCoins ?? 0}", //
+                                                  "${student.silverCoins ?? 0}",
                                                   "assets/images/silver.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Bronze cards",
-                                                  "${student.bronzeCoins ?? 0}", //
+                                                  "${student.bronzeCoins ?? 0}",
                                                   "assets/images/bronze.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Limit borrow books",
-                                                  "${student.borrowLimit ?? 0}", //
+                                                  "${student.borrowLimit ?? 0}",
                                                   "assets/images/borrowBook.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Finished stories",
-                                                  "${student.finishedStoriesCount ?? 0}", //
+                                                  "${student.finishedStoriesCount ?? 0}",
                                                   "assets/images/finishedStudentStories.png",
                                                 ),
                                                 _buildDetailRow(
                                                   "Finished Levels",
-                                                  "${student.finishedLevelsCount ?? 0}", //
+                                                  "${student.finishedLevelsCount ?? 0}",
                                                   "assets/images/studentLevel.png",
                                                 ),
                                                 SizedBox(height: 10.h),
@@ -571,6 +624,14 @@ class _SearchPageState extends State<SearchPage> {
                                                   children: [
                                                     ElevatedButton(
                                                       onPressed: () {
+                                                        _nameController.text =
+                                                            student.name ?? '';
+                                                        _borrowLimitController
+                                                                .text =
+                                                            student.borrowLimit
+                                                                ?.toString() ??
+                                                            '';
+
                                                         AwesomeDialog(
                                                           context: context,
                                                           dialogType: DialogType
@@ -590,7 +651,7 @@ class _SearchPageState extends State<SearchPage> {
                                                               children: [
                                                                 ElevatedButton(
                                                                   onPressed: () {
-                                                                    //! TODO: Implement logic to delete student image
+                                                                    // TODO: Implement logic to delete student image
                                                                   },
                                                                   style: ElevatedButton.styleFrom(
                                                                     backgroundColor:
@@ -613,7 +674,7 @@ class _SearchPageState extends State<SearchPage> {
                                                                 SizedBox(
                                                                   height: 20.h,
                                                                 ),
-                                                                // Class and Grade dropdowns
+
                                                                 Row(
                                                                   children: [
                                                                     Expanded(
@@ -695,8 +756,9 @@ class _SearchPageState extends State<SearchPage> {
                                                                 SizedBox(
                                                                   height: 20.h,
                                                                 ),
-
                                                                 TextField(
+                                                                  controller:
+                                                                      _nameController,
                                                                   decoration: InputDecoration(
                                                                     labelText:
                                                                         'student name',
@@ -715,8 +777,12 @@ class _SearchPageState extends State<SearchPage> {
                                                                 SizedBox(
                                                                   height: 20.h,
                                                                 ),
-
                                                                 TextField(
+                                                                  controller:
+                                                                      _borrowLimitController,
+                                                                  keyboardType:
+                                                                      TextInputType
+                                                                          .number,
                                                                   decoration: InputDecoration(
                                                                     labelText:
                                                                         'borrow limit',
@@ -736,10 +802,69 @@ class _SearchPageState extends State<SearchPage> {
                                                                 // "update" button inside the dialog
                                                                 ElevatedButton(
                                                                   onPressed: () {
-                                                                    // TODO: Implement logic to update student details
-                                                                    Navigator.of(
-                                                                      context,
-                                                                    ).pop(); // Close the dialog
+                                                                    final newName =
+                                                                        _nameController
+                                                                            .text
+                                                                            .trim();
+                                                                    final newBorrowLimit = int.tryParse(
+                                                                      _borrowLimitController
+                                                                          .text
+                                                                          .trim(),
+                                                                    );
+
+                                                                    if (newName
+                                                                            .isNotEmpty &&
+                                                                        newBorrowLimit !=
+                                                                            null) {
+                                                                      if (student.id !=
+                                                                              null &&
+                                                                          student.gClassId !=
+                                                                              null) {
+                                                                        final requestBody = EditStudentRequestBody(
+                                                                          name:
+                                                                              newName,
+                                                                          gClassId:
+                                                                              student.gClassId!,
+                                                                          borrowLimit:
+                                                                              newBorrowLimit,
+                                                                        );
+                                                                        context
+                                                                            .read<
+                                                                              EditStudentCubit
+                                                                            >()
+                                                                            .emitEditStudentState(
+                                                                              editStudentId: student.id!,
+                                                                              editStudentRequestBody: requestBody,
+                                                                            );
+                                                                      } else {
+                                                                        ScaffoldMessenger.of(
+                                                                          context,
+                                                                        ).showSnackBar(
+                                                                          const SnackBar(
+                                                                            content: Text(
+                                                                              'Missing student data to update.',
+                                                                            ),
+                                                                            backgroundColor:
+                                                                                Colors.red,
+                                                                          ),
+                                                                        );
+                                                                      }
+                                                                      Navigator.of(
+                                                                        context,
+                                                                      ).pop();
+                                                                    } else {
+                                                                      ScaffoldMessenger.of(
+                                                                        context,
+                                                                      ).showSnackBar(
+                                                                        const SnackBar(
+                                                                          content: Text(
+                                                                            'Please enter a valid name and number for borrow limit.',
+                                                                          ),
+                                                                          backgroundColor:
+                                                                              Colors.red,
+                                                                        ),
+                                                                      );
+                                                                    }
                                                                   },
                                                                   style: ElevatedButton.styleFrom(
                                                                     backgroundColor:
