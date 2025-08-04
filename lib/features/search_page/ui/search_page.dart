@@ -35,6 +35,9 @@ class _SearchPageState extends State<SearchPage> {
   late TextEditingController _nameController;
   late TextEditingController _borrowLimitController;
 
+  String? _selectedClassForDialog;
+  String? _selectedGradeForDialog;
+
   @override
   void initState() {
     super.initState();
@@ -631,6 +634,10 @@ class _SearchPageState extends State<SearchPage> {
                                                             student.borrowLimit
                                                                 ?.toString() ??
                                                             '';
+                                                        _selectedClassForDialog =
+                                                            'temp1';
+                                                        _selectedGradeForDialog =
+                                                            'grade 7'; // Set a default value
 
                                                         AwesomeDialog(
                                                           context: context,
@@ -642,251 +649,348 @@ class _SearchPageState extends State<SearchPage> {
                                                               'Update Student',
                                                           desc:
                                                               'Update student details',
-                                                          body: Padding(
-                                                            padding:
-                                                                const EdgeInsets.all(
-                                                                  16.0,
-                                                                ),
-                                                            child: Column(
-                                                              children: [
-                                                                ElevatedButton(
-                                                                  onPressed: () {
-                                                                    // TODO: Implement logic to delete student image
-                                                                  },
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .red,
-                                                                    foregroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10.r,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                  child: const Text(
-                                                                    'delete student image',
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 20.h,
-                                                                ),
+                                                          body: StatefulBuilder(
+                                                            builder:
+                                                                (
+                                                                  BuildContext
+                                                                  context,
+                                                                  StateSetter
+                                                                  setState,
+                                                                ) {
+                                                                  final List<
+                                                                    String
+                                                                  >
+                                                                  gradeItems =
+                                                                      _selectedClassForDialog ==
+                                                                          'temp1'
+                                                                      ? [
+                                                                          'grade 7',
+                                                                          'grade 8',
+                                                                          'grade 9',
+                                                                          'grade 10',
+                                                                        ]
+                                                                      : [];
+                                                                  final List<
+                                                                    String
+                                                                  >
+                                                                  classItems;
+                                                                  if (_selectedGradeForDialog ==
+                                                                      'grade 10') {
+                                                                    classItems =
+                                                                        ['sec1'];
+                                                                  } else if ([
+                                                                    'grade 7',
+                                                                    'grade 8',
+                                                                    'grade 9',
+                                                                  ].contains(
+                                                                    _selectedGradeForDialog,
+                                                                  )) {
+                                                                    classItems = [
+                                                                      'sec1',
+                                                                      'sec2',
+                                                                      'sec3',
+                                                                      'sec4',
+                                                                    ];
+                                                                  } else {
+                                                                    classItems =
+                                                                        [];
+                                                                  }
 
-                                                                Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: Container(
-                                                                        height:
-                                                                            40.h,
-                                                                        decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.circular(
-                                                                            10.r,
-                                                                          ),
-                                                                          border: Border.all(
-                                                                            color:
-                                                                                Colors.grey,
-                                                                          ),
-                                                                        ),
-                                                                        child: DropdownButtonHideUnderline(
-                                                                          child:
-                                                                              DropdownButton<
-                                                                                String
-                                                                              >(
-                                                                                value: 'temp1',
-                                                                                items: const [
-                                                                                  DropdownMenuItem(
-                                                                                    value: 'temp1',
-                                                                                    child: Text(
-                                                                                      'Class temp1',
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                                onChanged:
-                                                                                    (
-                                                                                      value,
-                                                                                    ) {},
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width:
-                                                                          10.w,
-                                                                    ),
-                                                                    Expanded(
-                                                                      child: Container(
-                                                                        height:
-                                                                            40.h,
-                                                                        decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.circular(
-                                                                            10.r,
-                                                                          ),
-                                                                          border: Border.all(
-                                                                            color:
-                                                                                Colors.grey,
-                                                                          ),
-                                                                        ),
-                                                                        child: DropdownButtonHideUnderline(
-                                                                          child:
-                                                                              DropdownButton<
-                                                                                String
-                                                                              >(
-                                                                                value: 'Temporary',
-                                                                                items: const [
-                                                                                  DropdownMenuItem(
-                                                                                    value: 'Temporary',
-                                                                                    child: Text(
-                                                                                      'Grade Temporary',
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                                onChanged:
-                                                                                    (
-                                                                                      value,
-                                                                                    ) {},
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 20.h,
-                                                                ),
-                                                                TextField(
-                                                                  controller:
-                                                                      _nameController,
-                                                                  decoration: InputDecoration(
-                                                                    labelText:
-                                                                        'student name',
-                                                                    hintText:
-                                                                        student
-                                                                            .name ??
-                                                                        '',
-                                                                    border: OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10.r,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 20.h,
-                                                                ),
-                                                                TextField(
-                                                                  controller:
-                                                                      _borrowLimitController,
-                                                                  keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                  decoration: InputDecoration(
-                                                                    labelText:
-                                                                        'borrow limit',
-                                                                    hintText:
-                                                                        '${student.borrowLimit ?? 0}',
-                                                                    border: OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10.r,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 20.h,
-                                                                ),
-                                                                // "update" button inside the dialog
-                                                                ElevatedButton(
-                                                                  onPressed: () {
-                                                                    final newName =
-                                                                        _nameController
-                                                                            .text
-                                                                            .trim();
-                                                                    final newBorrowLimit = int.tryParse(
-                                                                      _borrowLimitController
-                                                                          .text
-                                                                          .trim(),
-                                                                    );
+                                                                  // Ensure the selected values are still valid
+                                                                  if (!gradeItems
+                                                                      .contains(
+                                                                        _selectedGradeForDialog,
+                                                                      )) {
+                                                                    _selectedGradeForDialog =
+                                                                        gradeItems
+                                                                            .isNotEmpty
+                                                                        ? gradeItems
+                                                                              .first
+                                                                        : null;
+                                                                  }
+                                                                  if (!classItems
+                                                                      .contains(
+                                                                        _selectedClassForDialog,
+                                                                      )) {
+                                                                    _selectedClassForDialog =
+                                                                        classItems
+                                                                            .isNotEmpty
+                                                                        ? classItems
+                                                                              .first
+                                                                        : null;
+                                                                  }
 
-                                                                    if (newName
-                                                                            .isNotEmpty &&
-                                                                        newBorrowLimit !=
-                                                                            null) {
-                                                                      if (student.id !=
-                                                                              null &&
-                                                                          student.gClassId !=
-                                                                              null) {
-                                                                        final requestBody = EditStudentRequestBody(
-                                                                          name:
-                                                                              newName,
-                                                                          gClassId:
-                                                                              student.gClassId!,
-                                                                          borrowLimit:
-                                                                              newBorrowLimit,
-                                                                        );
-                                                                        context
-                                                                            .read<
-                                                                              EditStudentCubit
-                                                                            >()
-                                                                            .emitEditStudentState(
-                                                                              editStudentId: student.id!,
-                                                                              editStudentRequestBody: requestBody,
-                                                                            );
-                                                                      } else {
-                                                                        ScaffoldMessenger.of(
-                                                                          context,
-                                                                        ).showSnackBar(
-                                                                          const SnackBar(
-                                                                            content: Text(
-                                                                              'Missing student data to update.',
-                                                                            ),
+                                                                  return Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                          16.0,
+                                                                        ),
+                                                                    child: Column(
+                                                                      children: [
+                                                                        ElevatedButton(
+                                                                          onPressed: () {
+                                                                            // TODO: Implement logic to delete student image
+                                                                          },
+                                                                          style: ElevatedButton.styleFrom(
                                                                             backgroundColor:
                                                                                 Colors.red,
+                                                                            foregroundColor:
+                                                                                Colors.white,
+                                                                            shape: RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                10.r,
+                                                                              ),
+                                                                            ),
                                                                           ),
-                                                                        );
-                                                                      }
-                                                                      Navigator.of(
-                                                                        context,
-                                                                      ).pop();
-                                                                    } else {
-                                                                      ScaffoldMessenger.of(
-                                                                        context,
-                                                                      ).showSnackBar(
-                                                                        const SnackBar(
-                                                                          content: Text(
-                                                                            'Please enter a valid name and number for borrow limit.',
+                                                                          child: const Text(
+                                                                            'delete student image',
                                                                           ),
-                                                                          backgroundColor:
-                                                                              Colors.red,
                                                                         ),
-                                                                      );
-                                                                    }
-                                                                  },
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blue,
-                                                                    foregroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10.r,
+                                                                        SizedBox(
+                                                                          height:
+                                                                              20.h,
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Container(
+                                                                                height: 40.h,
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(
+                                                                                    10.r,
+                                                                                  ),
+                                                                                  border: Border.all(
+                                                                                    color: Colors.grey,
+                                                                                  ),
+                                                                                ),
+                                                                                child: DropdownButtonHideUnderline(
+                                                                                  child:
+                                                                                      DropdownButton<
+                                                                                        String
+                                                                                      >(
+                                                                                        value: _selectedClassForDialog,
+                                                                                        items:
+                                                                                            classItems.map<
+                                                                                              DropdownMenuItem<
+                                                                                                String
+                                                                                              >
+                                                                                            >(
+                                                                                              (
+                                                                                                String value,
+                                                                                              ) {
+                                                                                                return DropdownMenuItem<
+                                                                                                  String
+                                                                                                >(
+                                                                                                  value: value,
+                                                                                                  child: Text(
+                                                                                                    value,
+                                                                                                  ),
+                                                                                                );
+                                                                                              },
+                                                                                            ).toList(),
+                                                                                        onChanged:
+                                                                                            (
+                                                                                              String? newValue,
+                                                                                            ) {
+                                                                                              setState(
+                                                                                                () {
+                                                                                                  _selectedClassForDialog = newValue;
+                                                                                                  // Logic to update grades based on class can be added here if needed
+                                                                                                },
+                                                                                              );
+                                                                                            },
+                                                                                      ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: 10.w,
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Container(
+                                                                                height: 40.h,
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(
+                                                                                    10.r,
+                                                                                  ),
+                                                                                  border: Border.all(
+                                                                                    color: Colors.grey,
+                                                                                  ),
+                                                                                ),
+                                                                                child: DropdownButtonHideUnderline(
+                                                                                  child:
+                                                                                      DropdownButton<
+                                                                                        String
+                                                                                      >(
+                                                                                        value: _selectedGradeForDialog,
+                                                                                        items:
+                                                                                            gradeItems.map<
+                                                                                              DropdownMenuItem<
+                                                                                                String
+                                                                                              >
+                                                                                            >(
+                                                                                              (
+                                                                                                String value,
+                                                                                              ) {
+                                                                                                return DropdownMenuItem<
+                                                                                                  String
+                                                                                                >(
+                                                                                                  value: value,
+                                                                                                  child: Text(
+                                                                                                    value,
+                                                                                                  ),
+                                                                                                );
+                                                                                              },
+                                                                                            ).toList(),
+                                                                                        onChanged:
+                                                                                            (
+                                                                                              String? newValue,
+                                                                                            ) {
+                                                                                              setState(
+                                                                                                () {
+                                                                                                  _selectedGradeForDialog = newValue;
+                                                                                                  // Logic to update classes based on grade
+                                                                                                  if (_selectedGradeForDialog ==
+                                                                                                      'grade 10') {
+                                                                                                    _selectedClassForDialog = 'sec1';
+                                                                                                  } else if ([
+                                                                                                    'grade 7',
+                                                                                                    'grade 8',
+                                                                                                    'grade 9',
+                                                                                                  ].contains(
+                                                                                                    _selectedGradeForDialog,
+                                                                                                  )) {
+                                                                                                    _selectedClassForDialog = 'sec1'; // Or another default
+                                                                                                  }
+                                                                                                },
+                                                                                              );
+                                                                                            },
+                                                                                      ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              20.h,
+                                                                        ),
+                                                                        TextField(
+                                                                          controller:
+                                                                              _nameController,
+                                                                          decoration: InputDecoration(
+                                                                            labelText:
+                                                                                'student name',
+                                                                            hintText:
+                                                                                student.name ??
+                                                                                '',
+                                                                            border: OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                10.r,
+                                                                              ),
+                                                                            ),
                                                                           ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              20.h,
+                                                                        ),
+                                                                        TextField(
+                                                                          controller:
+                                                                              _borrowLimitController,
+                                                                          keyboardType:
+                                                                              TextInputType.number,
+                                                                          decoration: InputDecoration(
+                                                                            labelText:
+                                                                                'borrow limit',
+                                                                            hintText:
+                                                                                '${student.borrowLimit ?? 0}',
+                                                                            border: OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                10.r,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              20.h,
+                                                                        ),
+                                                                        ElevatedButton(
+                                                                          onPressed: () {
+                                                                            final newName =
+                                                                                _nameController.text.trim();
+                                                                            final newBorrowLimit = int.tryParse(
+                                                                              _borrowLimitController.text.trim(),
+                                                                            );
+
+                                                                            if (newName.isNotEmpty &&
+                                                                                newBorrowLimit !=
+                                                                                    null) {
+                                                                              if (student.id !=
+                                                                                      null &&
+                                                                                  student.gClassId !=
+                                                                                      null) {
+                                                                                final requestBody = EditStudentRequestBody(
+                                                                                  name: newName,
+                                                                                  gClassId: student.gClassId!,
+                                                                                  borrowLimit: newBorrowLimit,
+                                                                                );
+                                                                                context
+                                                                                    .read<
+                                                                                      EditStudentCubit
+                                                                                    >()
+                                                                                    .emitEditStudentState(
+                                                                                      editStudentId: student.id!,
+                                                                                      editStudentRequestBody: requestBody,
+                                                                                    );
+                                                                              } else {
+                                                                                ScaffoldMessenger.of(
+                                                                                  context,
+                                                                                ).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Text(
+                                                                                      'Missing student data to update.',
+                                                                                    ),
+                                                                                    backgroundColor: Colors.red,
+                                                                                  ),
+                                                                                );
+                                                                              }
+                                                                              Navigator.of(
+                                                                                context,
+                                                                              ).pop();
+                                                                            } else {
+                                                                              ScaffoldMessenger.of(
+                                                                                context,
+                                                                              ).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Text(
+                                                                                    'Please enter a valid name and number for borrow limit.',
+                                                                                  ),
+                                                                                  backgroundColor: Colors.red,
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                          },
+                                                                          style: ElevatedButton.styleFrom(
+                                                                            backgroundColor:
+                                                                                Colors.blue,
+                                                                            foregroundColor:
+                                                                                Colors.white,
+                                                                            shape: RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                10.r,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          child: const Text(
+                                                                            'update',
+                                                                          ),
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                  ),
-                                                                  child:
-                                                                      const Text(
-                                                                        'update',
-                                                                      ),
-                                                                ),
-                                                              ],
-                                                            ),
+                                                                  );
+                                                                },
                                                           ),
                                                         ).show();
                                                       },

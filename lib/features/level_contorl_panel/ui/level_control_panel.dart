@@ -1,3 +1,4 @@
+import 'package:english_app/core/helpers/extensions.dart';
 import 'package:flutter/material.dart';
 
 class LevelControlPanel extends StatelessWidget {
@@ -12,14 +13,16 @@ class LevelControlPanel extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {},
+          onPressed: () {
+            context.pop();
+          },
         ),
         title: const Text(
           'Level control panel',
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Container(child: Text("")),
+      body: Container(child: Text("Level control panel")),
     );
   }
 }

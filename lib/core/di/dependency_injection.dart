@@ -4,8 +4,10 @@ import 'package:english_app/features/add_students_manually/data/repos/create_stu
 import 'package:english_app/features/add_students_manually/logic/create_student_cubit.dart';
 
 import 'package:english_app/features/english_club/data/repos/create_section_repo.dart';
+import 'package:english_app/features/english_club/data/repos/edit_section_name_repo.dart';
 import 'package:english_app/features/english_club/data/repos/english_club_repo.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
+import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_class_repo.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_grade_repo.dart';
@@ -139,4 +141,11 @@ Future<void> setupGetIt() async {
   // edit student
   getIt.registerLazySingleton<EditStudentRepo>(() => EditStudentRepo(getIt()));
   getIt.registerFactory<EditStudentCubit>(() => EditStudentCubit(getIt()));
+  // edit section
+  getIt.registerLazySingleton<EditSectionNameRepo>(
+    () => EditSectionNameRepo(getIt()),
+  );
+  getIt.registerFactory<EditSectionNameCubit>(
+    () => EditSectionNameCubit(getIt()),
+  );
 }

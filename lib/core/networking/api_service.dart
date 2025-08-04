@@ -5,6 +5,8 @@ import 'package:english_app/features/add_students_manually/data/models/create_st
 
 import 'package:english_app/features/english_club/data/models/create_section_request_body.dart';
 import 'package:english_app/features/english_club/data/models/create_section_response.dart';
+import 'package:english_app/features/english_club/data/models/edit_section_name_request_body.dart';
+import 'package:english_app/features/english_club/data/models/edit_section_name_response.dart';
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_class_request_body.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/models/create_class_response.dart';
@@ -159,5 +161,11 @@ abstract class ApiService {
   Future<EditStudentResponse> editStudent(
     @Path("edit_student_id") int editStudentId,
     @Body() EditStudentRequestBody editStudentRequestBody,
+  );
+  // edit section
+  @PUT('admin/sections/{edit_section_id}')
+  Future<EditSectionNameResponse> editSection(
+    @Path("edit_section_id") int editSectionId,
+    @Body() EditSectionNameRequestBody editSectionRequestBody,
   );
 }

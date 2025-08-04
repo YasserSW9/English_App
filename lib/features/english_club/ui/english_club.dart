@@ -12,6 +12,7 @@ import 'package:english_app/features/english_club/ui/widgets/english_club_app_ba
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class Englishclub extends StatefulWidget {
   const Englishclub({super.key});
@@ -161,35 +162,107 @@ class _EnglishclubState extends State<Englishclub> {
                               const Text('Sections:'),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 5,
+                                child: Slidable(
+                                  // The start action pane is the one that shows up when the user drags the item to the right.
+                                  endActionPane: ActionPane(
+                                    // A motion is a widget used to control how the pane animates.
+                                    motion: const ScrollMotion(),
+                                    // All actions are defined in the children parameter.
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          // TODO: Implement "Add Section" functionality
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Add Section action triggered!',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        backgroundColor: Colors.green,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.add_circle_outline,
+                                        label: "Add Level",
+                                      ),
+                                    ],
                                   ),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(15),
+
+                                  // The end action pane is the one that shows up when the user drags the item to the left.
+                                  startActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          // TODO: Implement "Edit Section" functionality
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Edit Section action triggered!',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        backgroundColor: Colors.blue,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.edit,
+                                        label: 'Edit Section',
+                                      ),
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          // TODO: Implement "Delete Section" functionality
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Delete Section action triggered!',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                        label: 'Delete Section',
+                                      ),
+                                    ],
                                   ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: _selectedSectionName,
-                                      isExpanded: true,
-                                      icon: const Icon(Icons.arrow_drop_down),
-                                      items: availableDropdownSections
-                                          .map<DropdownMenuItem<String>>((
-                                            String value,
-                                          ) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          })
-                                          .toList(),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          _selectedSectionName = newValue;
-                                        });
-                                      },
+                                  // The child widget to show
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        value: _selectedSectionName,
+                                        isExpanded: true,
+                                        icon: const Icon(Icons.arrow_drop_down),
+                                        items: availableDropdownSections
+                                            .map<DropdownMenuItem<String>>((
+                                              String value,
+                                            ) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            })
+                                            .toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            _selectedSectionName = newValue;
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -224,38 +297,86 @@ class _EnglishclubState extends State<Englishclub> {
 
                                 return Column(
                                   children: [
-                                    InkWell(
-                                      onTap: () {
-                                        context.pushNamed(
-                                          Routes.levelControlPanel,
-                                        );
-                                      },
-                                      child: Container(
-                                        width: double.infinity,
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 5,
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 15,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.orange,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                    Slidable(
+                                      endActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        children: [
+                                          SlidableAction(
+                                            onPressed: (context) {
+                                              // TODO: Implement "Add Level" functionality
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Add Level action triggered!',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            backgroundColor: Colors.green,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.add_circle_outline,
+                                            label: 'Add Sub Level',
                                           ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            subDataItem.name
-                                                    ?.split('/')
-                                                    .first
-                                                    .trim() ??
-                                                'Sub-Section Name N/A',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
+                                        ],
+                                      ),
+                                      startActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        children: [
+                                          SlidableAction(
+                                            onPressed: (context) {
+                                              // TODO: Implement "Delete" functionality
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Delete action triggered!',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.delete,
+                                            label: 'Delete',
+                                          ),
+                                        ],
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          context.pushNamed(
+                                            Routes.levelControlPanel,
+                                          );
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 15,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              subDataItem.name
+                                                      ?.split('/')
+                                                      .first
+                                                      .trim() ??
+                                                  'Sub-Section Name N/A',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -373,8 +494,6 @@ class _EnglishclubState extends State<Englishclub> {
                                                                         "${ApiConstants.imageUrl}${story.coverUrl!}",
                                                                         fit: BoxFit
                                                                             .cover,
-
-                                                                        // ! TODO FIX THE COVER ISSUE
                                                                         errorBuilder:
                                                                             (
                                                                               context,
@@ -396,7 +515,6 @@ class _EnglishclubState extends State<Englishclub> {
                                                                         4.0,
                                                                       ),
                                                                   child: Text(
-                                                                    // ** استخدام story.title **
                                                                     story.title ??
                                                                         'No Title',
                                                                     textAlign:

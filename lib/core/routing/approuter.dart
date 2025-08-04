@@ -4,8 +4,10 @@ import 'package:english_app/features/add_students_by_excel/ui/add_students_by_ex
 import 'package:english_app/features/add_students_manually/logic/create_student_cubit.dart';
 import 'package:english_app/features/add_students_manually/ui/add_students_manually.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
+import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/english_club/ui/english_club.dart';
+import 'package:english_app/features/level_contorl_panel/ui/level_control_panel.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/create_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/delete_class_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/logic/cubit/edit_class_cubit.dart';
@@ -94,6 +96,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => getIt<EditSectionNameCubit>()),
               BlocProvider(create: (context) => getIt<CreateSectionCubit>()),
               BlocProvider(create: (context) => getIt<EnglishClubCubit>()),
             ],
@@ -136,7 +139,7 @@ class AppRouter {
           ),
         );
       case Routes.levelControlPanel:
-        return MaterialPageRoute(builder: (_) => RoadMap());
+        return MaterialPageRoute(builder: (_) => LevelControlPanel());
 
       default:
         return null;
