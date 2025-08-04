@@ -1,10 +1,12 @@
-import 'package:collection/collection.dart'; // Import this for firstWhereOrNull extension
+import 'package:collection/collection.dart';
 import 'package:english_app/core/helpers/extensions.dart';
 import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/core/routing/routes.dart';
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/create_section_state.dart';
+import 'package:english_app/features/english_club/logic/delete_section_cubit.dart';
+import 'package:english_app/features/english_club/logic/delete_section_state.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_state.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
@@ -51,14 +53,12 @@ class _EnglishclubState extends State<Englishclub> {
             listener: (context, state) {
               state.whenOrNull(
                 error: (error) {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.error,
-                    animType: AnimType.rightSlide,
-                    title: 'Error!',
-                    desc: 'Failed to load sections: $error',
-                    btnOkOnPress: () {},
-                  ).show();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: Failed to load sections: $error'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 },
               );
             },
@@ -72,24 +72,23 @@ class _EnglishclubState extends State<Englishclub> {
                   );
                 },
                 success: (data) {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.success,
-                    animType: AnimType.rightSlide,
-                    title: 'Success!',
-                    desc: 'Section "${data.data!.name}" created successfully.',
-                    btnOkOnPress: () {},
-                  ).show();
+                  context.read<EnglishClubCubit>().emitGetEnglishClubSections();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Section "${data.data!.name}" created successfully.',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 },
                 error: (error) {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.error,
-                    animType: AnimType.rightSlide,
-                    title: 'Error!',
-                    desc: 'Failed to create section: $error',
-                    btnOkOnPress: () {},
-                  ).show();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: Failed to create section: $error'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 },
               );
             },
@@ -104,24 +103,52 @@ class _EnglishclubState extends State<Englishclub> {
                 },
                 success: (data) {
                   context.read<EnglishClubCubit>().emitGetEnglishClubSections();
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.success,
-                    animType: AnimType.rightSlide,
-                    title: 'Success!',
-                    desc: data.message,
-                    btnOkOnPress: () {},
-                  ).show();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(data.message!),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 },
                 error: (error) {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.error,
-                    animType: AnimType.rightSlide,
-                    title: 'Error!',
-                    desc: 'Failed to update section name: $error',
-                    btnOkOnPress: () {},
-                  ).show();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error: Failed to update section name: $error',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          BlocListener<DeleteSectionCubit, DeleteSectionState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                loading: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Deleting section...')),
+                  );
+                },
+                success: (data) {
+                  context.read<EnglishClubCubit>().emitGetEnglishClubSections();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(data.message!),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+                error: (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error: Failed to delete section: ${error.toString()}',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 },
               );
             },
@@ -180,6 +207,7 @@ class _EnglishclubState extends State<Englishclub> {
                             (element) =>
                                 element.sectionName == _selectedSectionName,
                           );
+                      //! Todo sectionid
                       selectedSectionId = selectedClubData?.sectionId;
                     }
 
@@ -294,47 +322,28 @@ class _EnglishclubState extends State<Englishclub> {
                                       ),
                                       SlidableAction(
                                         onPressed: (context) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext dialogContext) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                  'Are you sure?',
-                                                ),
-                                                content: const Text(
-                                                  'Do you want to delete this section?',
-                                                ),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(
-                                                        dialogContext,
-                                                      ).pop();
-                                                    },
-                                                    child: const Text('Cancel'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      ScaffoldMessenger.of(
-                                                        context,
-                                                      ).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            'Deletion of section "$_selectedSectionName" confirmed!',
-                                                          ),
-                                                        ),
-                                                      );
+                                          if (selectedSectionId != null) {
+                                            print(
+                                              'Attempting to delete section with ID: $selectedSectionId',
+                                            );
 
-                                                      Navigator.of(
-                                                        dialogContext,
-                                                      ).pop();
-                                                    },
-                                                    child: const Text('Done'),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
+                                            context
+                                                .read<DeleteSectionCubit>()
+                                                .emitDeleteSection(
+                                                  selectedSectionId.toString(),
+                                                );
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Cannot delete, section ID is missing.',
+                                                ),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
                                         },
                                         backgroundColor: Colors.red,
                                         foregroundColor: Colors.white,

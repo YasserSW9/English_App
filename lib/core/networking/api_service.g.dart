@@ -750,7 +750,7 @@ class _ApiService implements ApiService {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'admin/classes/${deleteSectionId}',
+            'admin/sections/${deleteSectionId}',
             queryParameters: queryParameters,
             data: _data,
           )

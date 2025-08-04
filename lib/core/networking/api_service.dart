@@ -170,7 +170,7 @@ abstract class ApiService {
     @Body() EditSectionNameRequestBody editSectionRequestBody,
   );
   // delete section
-  @DELETE("admin/classes/{delete_section_id}")
+  @DELETE("admin/sections/{delete_section_id}")
   Future<DeleteSectionResponse> deleteSection(
     @Path("delete_section_id") String deleteSectionId,
   );
