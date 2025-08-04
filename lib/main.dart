@@ -26,7 +26,7 @@ class EnglishClub extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: Routes.adminMainScreen,
+          initialRoute: Routes.englishclub,
           onGenerateRoute: appRouter.generateRoute,
         );
       },

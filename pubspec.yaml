@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   awesome_dialog: ^3.2.1
+  collection: ^1.17.2 
   bloc: ^9.0.0
   build_runner: ^2.6.0
   cupertino_icons: ^1.0.8

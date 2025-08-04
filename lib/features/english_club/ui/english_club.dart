@@ -1,11 +1,12 @@
-// english_app.dart
+import 'package:collection/collection.dart'; // Import this for firstWhereOrNull extension
 import 'package:english_app/core/helpers/extensions.dart';
 import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/core/routing/routes.dart';
-
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/create_section_state.dart';
+import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
+import 'package:english_app/features/english_club/logic/edit_section_name_state.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_state.dart';
 import 'package:english_app/features/english_club/ui/widgets/english_club_app_bar.dart';
@@ -28,11 +29,6 @@ class _EnglishclubState extends State<Englishclub> {
   void initState() {
     super.initState();
     context.read<EnglishClubCubit>().emitGetEnglishClubSections();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -98,6 +94,38 @@ class _EnglishclubState extends State<Englishclub> {
               );
             },
           ),
+          BlocListener<EditSectionNameCubit, EditSectionNameState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                loading: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Updating section name...')),
+                  );
+                },
+                success: (data) {
+                  context.read<EnglishClubCubit>().emitGetEnglishClubSections();
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.success,
+                    animType: AnimType.rightSlide,
+                    title: 'Success!',
+                    desc: data.message,
+                    btnOkOnPress: () {},
+                  ).show();
+                },
+                error: (error) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.error,
+                    animType: AnimType.rightSlide,
+                    title: 'Error!',
+                    desc: 'Failed to update section name: $error',
+                    btnOkOnPress: () {},
+                  ).show();
+                },
+              );
+            },
+          ),
         ],
         child: BlocBuilder<EnglishClubCubit, EnglishClubState>(
           builder: (context, state) {
@@ -145,6 +173,16 @@ class _EnglishclubState extends State<Englishclub> {
                     final List<ClubData> currentSelectedClubDataList =
                         allSectionsCategorized[_selectedSectionName] ?? [];
 
+                    int? selectedSectionId;
+                    if (_selectedSectionName != null) {
+                      final ClubData? selectedClubData =
+                          currentSelectedClubDataList.firstWhereOrNull(
+                            (element) =>
+                                element.sectionName == _selectedSectionName,
+                          );
+                      selectedSectionId = selectedClubData?.sectionId;
+                    }
+
                     final List<ClubSubData> flatSubDataList = [];
                     for (var clubDataItem in currentSelectedClubDataList) {
                       if (clubDataItem.data != null) {
@@ -163,15 +201,11 @@ class _EnglishclubState extends State<Englishclub> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Slidable(
-                                  // The start action pane is the one that shows up when the user drags the item to the right.
                                   endActionPane: ActionPane(
-                                    // A motion is a widget used to control how the pane animates.
                                     motion: const ScrollMotion(),
-                                    // All actions are defined in the children parameter.
                                     children: [
                                       SlidableAction(
                                         onPressed: (context) {
-                                          // TODO: Implement "Add Section" functionality
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
@@ -189,22 +223,68 @@ class _EnglishclubState extends State<Englishclub> {
                                       ),
                                     ],
                                   ),
-
-                                  // The end action pane is the one that shows up when the user drags the item to the left.
                                   startActionPane: ActionPane(
                                     motion: const ScrollMotion(),
                                     children: [
                                       SlidableAction(
                                         onPressed: (context) {
-                                          // TODO: Implement "Edit Section" functionality
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Edit Section action triggered!',
-                                              ),
-                                            ),
+                                          final cubit = context
+                                              .read<EditSectionNameCubit>();
+                                          cubit.sectionNameController.text =
+                                              _selectedSectionName ?? '';
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                  'Edit Section Name',
+                                                ),
+                                                content: TextFormField(
+                                                  controller: cubit
+                                                      .sectionNameController,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                        labelText:
+                                                            'Section Name',
+                                                        border:
+                                                            OutlineInputBorder(),
+                                                      ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Cancel'),
+                                                    onPressed: () {
+                                                      Navigator.of(
+                                                        dialogContext,
+                                                      ).pop();
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text('Done'),
+                                                    onPressed: () {
+                                                      final newName = cubit
+                                                          .sectionNameController
+                                                          .text
+                                                          .trim();
+                                                      if (newName.isNotEmpty &&
+                                                          newName !=
+                                                              _selectedSectionName &&
+                                                          selectedSectionId !=
+                                                              null) {
+                                                        cubit
+                                                            .emitEditSectionName(
+                                                              selectedSectionId,
+                                                            );
+                                                      }
+                                                      Navigator.of(
+                                                        dialogContext,
+                                                      ).pop();
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                           );
                                         },
                                         backgroundColor: Colors.blue,
@@ -214,7 +294,6 @@ class _EnglishclubState extends State<Englishclub> {
                                       ),
                                       SlidableAction(
                                         onPressed: (context) {
-                                          // TODO: Implement "Delete Section" functionality
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
@@ -232,7 +311,6 @@ class _EnglishclubState extends State<Englishclub> {
                                       ),
                                     ],
                                   ),
-                                  // The child widget to show
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 10,
@@ -271,7 +349,6 @@ class _EnglishclubState extends State<Englishclub> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
                         if (flatSubDataList.isEmpty)
                           const Expanded(
                             child: Center(
@@ -280,7 +357,6 @@ class _EnglishclubState extends State<Englishclub> {
                               ),
                             ),
                           ),
-
                         if (flatSubDataList.isNotEmpty)
                           Expanded(
                             child: ListView.builder(
@@ -303,7 +379,6 @@ class _EnglishclubState extends State<Englishclub> {
                                         children: [
                                           SlidableAction(
                                             onPressed: (context) {
-                                              // TODO: Implement "Add Level" functionality
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(
@@ -326,7 +401,6 @@ class _EnglishclubState extends State<Englishclub> {
                                         children: [
                                           SlidableAction(
                                             onPressed: (context) {
-                                              // TODO: Implement "Delete" functionality
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(

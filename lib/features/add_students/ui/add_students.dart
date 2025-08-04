@@ -62,7 +62,6 @@ class AddStudents extends StatelessWidget {
 
               InkWell(
                 onTap: () {
-                  print("excel");
                   AwesomeDialog(
                     context: context,
                     dialogType: DialogType.success,
