@@ -4,6 +4,7 @@ import 'package:english_app/features/add_students_by_excel/ui/add_students_by_ex
 import 'package:english_app/features/add_students_manually/logic/create_student_cubit.dart';
 import 'package:english_app/features/add_students_manually/ui/add_students_manually.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
+import 'package:english_app/features/english_club/logic/delete_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/english_club/ui/english_club.dart';
@@ -96,6 +97,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => getIt<DeleteSectionCubit>()),
               BlocProvider(create: (context) => getIt<EditSectionNameCubit>()),
               BlocProvider(create: (context) => getIt<CreateSectionCubit>()),
               BlocProvider(create: (context) => getIt<EnglishClubCubit>()),

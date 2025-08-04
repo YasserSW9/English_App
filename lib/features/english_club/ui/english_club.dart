@@ -294,14 +294,46 @@ class _EnglishclubState extends State<Englishclub> {
                                       ),
                                       SlidableAction(
                                         onPressed: (context) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Delete Section action triggered!',
-                                              ),
-                                            ),
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                  'Are you sure?',
+                                                ),
+                                                content: const Text(
+                                                  'Do you want to delete this section?',
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(
+                                                        dialogContext,
+                                                      ).pop();
+                                                    },
+                                                    child: const Text('Cancel'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            'Deletion of section "$_selectedSectionName" confirmed!',
+                                                          ),
+                                                        ),
+                                                      );
+
+                                                      Navigator.of(
+                                                        dialogContext,
+                                                      ).pop();
+                                                    },
+                                                    child: const Text('Done'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                           );
                                         },
                                         backgroundColor: Colors.red,
