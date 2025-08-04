@@ -26,6 +26,8 @@ import 'package:english_app/features/login/data/models/login_request_body.dart';
 import 'package:english_app/features/login/data/models/login_response.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart';
 import 'package:english_app/features/search_page/data/models/delete_student_response.dart';
+import 'package:english_app/features/search_page/data/models/edit_student_request_body.dart';
+import 'package:english_app/features/search_page/data/models/edit_student_response.dart';
 import 'package:english_app/features/search_page/data/models/inactive_request_body.dart';
 import 'package:english_app/features/search_page/data/models/inactive_response.dart';
 import 'package:english_app/features/story_details/data/models/story_response.dart';
@@ -151,5 +153,11 @@ abstract class ApiService {
   @DELETE("admin/classes/{delete_class_id}")
   Future<DeleteClassResponse> deleteClass(
     @Path("delete_class_id") String deleteClassId,
+  );
+  // edit student
+  @PATCH("admin/students/{edit_student_id}")
+  Future<EditStudentResponse> editStudent(
+    @Path("edit_student_id") int editStudentId,
+    @Body() EditStudentRequestBody editStudentRequestBody,
   );
 }

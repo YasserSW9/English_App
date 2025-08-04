@@ -7,7 +7,6 @@ part 'class_state.freezed.dart';
 abstract class ClassState<T> with _$ClassState<T> {
   const factory ClassState.initial() = _Initial;
   const factory ClassState.loading() = Loading;
-  const factory ClassState.success(T data) =
-      Success<T>; // T ستكون List<Students>
+  const factory ClassState.success(T data) = Success<T>;
   const factory ClassState.error({required String error}) = Error;
 }

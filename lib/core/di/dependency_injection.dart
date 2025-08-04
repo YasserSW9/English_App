@@ -33,9 +33,11 @@ import 'package:english_app/features/login/data/repos/login_repo.dart';
 import 'package:english_app/features/login/logic/cubit/login_cubit.dart';
 import 'package:english_app/features/search_page/data/repos/class_repo.dart';
 import 'package:english_app/features/search_page/data/repos/delete_student_repo.dart';
+import 'package:english_app/features/search_page/data/repos/edit_student_repo.dart';
 import 'package:english_app/features/search_page/data/repos/inactive_repo.dart';
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
 import 'package:english_app/features/search_page/logic/delete_student_cubit.dart';
+import 'package:english_app/features/search_page/logic/edit_student_cubit.dart';
 import 'package:english_app/features/search_page/logic/inactive_student_cubit.dart';
 import 'package:english_app/features/story_details/data/repos/story_repo.dart';
 import 'package:english_app/features/story_details/logic/cubit/story_cubit.dart';
@@ -134,4 +136,7 @@ Future<void> setupGetIt() async {
   // delete class
   getIt.registerLazySingleton<DeleteClassRepo>(() => DeleteClassRepo(getIt()));
   getIt.registerFactory<DeleteClassCubit>(() => DeleteClassCubit(getIt()));
+  // edit student
+  getIt.registerLazySingleton<EditStudentRepo>(() => EditStudentRepo(getIt()));
+  getIt.registerFactory<EditStudentCubit>(() => EditStudentCubit(getIt()));
 }

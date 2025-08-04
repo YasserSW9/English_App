@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:english_app/core/networking/api_contants.dart';
 import 'package:english_app/features/search_page/data/models/class_response.dart'; //
 import 'package:english_app/features/search_page/logic/class_cubit.dart';
@@ -570,9 +571,199 @@ class _SearchPageState extends State<SearchPage> {
                                                   children: [
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        print(
-                                                          'Update button pressed for ${student.name}',
-                                                        );
+                                                        AwesomeDialog(
+                                                          context: context,
+                                                          dialogType: DialogType
+                                                              .noHeader,
+                                                          animType: AnimType
+                                                              .bottomSlide,
+                                                          title:
+                                                              'Update Student',
+                                                          desc:
+                                                              'Update student details',
+                                                          body: Padding(
+                                                            padding:
+                                                                const EdgeInsets.all(
+                                                                  16.0,
+                                                                ),
+                                                            child: Column(
+                                                              children: [
+                                                                ElevatedButton(
+                                                                  onPressed: () {
+                                                                    //! TODO: Implement logic to delete student image
+                                                                  },
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  child: const Text(
+                                                                    'delete student image',
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 20.h,
+                                                                ),
+                                                                // Class and Grade dropdowns
+                                                                Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: Container(
+                                                                        height:
+                                                                            40.h,
+                                                                        decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                          border: Border.all(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          ),
+                                                                        ),
+                                                                        child: DropdownButtonHideUnderline(
+                                                                          child:
+                                                                              DropdownButton<
+                                                                                String
+                                                                              >(
+                                                                                value: 'temp1',
+                                                                                items: const [
+                                                                                  DropdownMenuItem(
+                                                                                    value: 'temp1',
+                                                                                    child: Text(
+                                                                                      'Class temp1',
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                                onChanged:
+                                                                                    (
+                                                                                      value,
+                                                                                    ) {},
+                                                                              ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width:
+                                                                          10.w,
+                                                                    ),
+                                                                    Expanded(
+                                                                      child: Container(
+                                                                        height:
+                                                                            40.h,
+                                                                        decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                          border: Border.all(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          ),
+                                                                        ),
+                                                                        child: DropdownButtonHideUnderline(
+                                                                          child:
+                                                                              DropdownButton<
+                                                                                String
+                                                                              >(
+                                                                                value: 'Temporary',
+                                                                                items: const [
+                                                                                  DropdownMenuItem(
+                                                                                    value: 'Temporary',
+                                                                                    child: Text(
+                                                                                      'Grade Temporary',
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                                onChanged:
+                                                                                    (
+                                                                                      value,
+                                                                                    ) {},
+                                                                              ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 20.h,
+                                                                ),
+
+                                                                TextField(
+                                                                  decoration: InputDecoration(
+                                                                    labelText:
+                                                                        'student name',
+                                                                    hintText:
+                                                                        student
+                                                                            .name ??
+                                                                        '',
+                                                                    border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 20.h,
+                                                                ),
+
+                                                                TextField(
+                                                                  decoration: InputDecoration(
+                                                                    labelText:
+                                                                        'borrow limit',
+                                                                    hintText:
+                                                                        '${student.borrowLimit ?? 0}',
+                                                                    border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 20.h,
+                                                                ),
+                                                                // "update" button inside the dialog
+                                                                ElevatedButton(
+                                                                  onPressed: () {
+                                                                    // TODO: Implement logic to update student details
+                                                                    Navigator.of(
+                                                                      context,
+                                                                    ).pop(); // Close the dialog
+                                                                  },
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .blue,
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            10.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  child:
+                                                                      const Text(
+                                                                        'update',
+                                                                      ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ).show();
                                                       },
                                                       style: ElevatedButton.styleFrom(
                                                         backgroundColor:
@@ -592,15 +783,11 @@ class _SearchPageState extends State<SearchPage> {
                                                             ),
                                                       ),
                                                       child: const Text(
-                                                        'Update',
+                                                        "Update",
                                                       ),
                                                     ),
                                                     ElevatedButton(
-                                                      onPressed: () {
-                                                        print(
-                                                          'Road Map button pressed for ${student.name}',
-                                                        );
-                                                      },
+                                                      onPressed: () {},
                                                       style: ElevatedButton.styleFrom(
                                                         backgroundColor:
                                                             Colors.deepPurple,
