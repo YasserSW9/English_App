@@ -65,9 +65,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.error,
                     animType: AnimType.bottomSlide,
                     title: 'Error',
-                    desc:
-                        error ??
-                        'An unknown error occurred while fetching grades.',
+                    desc: error,
                     btnOkOnPress: () {},
                   ).show();
                 },
@@ -107,9 +105,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.error,
                     animType: AnimType.bottomSlide,
                     title: 'Error',
-                    desc:
-                        error ??
-                        'An unknown error occurred during grade creation.',
+                    desc: error,
                     btnOkOnPress: () {},
                   ).show();
                 },
@@ -149,9 +145,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                     dialogType: DialogType.error,
                     animType: AnimType.bottomSlide,
                     title: 'Error',
-                    desc:
-                        error ??
-                        'An unknown error occurred during grade update.',
+                    desc: error,
                     btnOkOnPress: () {},
                   ).show();
                 },
@@ -349,7 +343,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                                   .gradeNameController
                                   .clear();
                             },
-                          )..show();
+                          ).show();
                         },
                       ),
                       const SizedBox(height: 20),
@@ -449,7 +443,7 @@ class _ManageGradesAndClassesState extends State<ManageGradesAndClasses> {
                               .gradeNameController
                               .clear();
                         },
-                      )..show();
+                      ).show();
                     },
                   );
                 }

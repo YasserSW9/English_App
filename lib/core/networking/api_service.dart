@@ -6,6 +6,7 @@ import 'package:english_app/features/add_students_manually/data/models/create_st
 import 'package:english_app/features/english_club/data/models/create_section_request_body.dart';
 import 'package:english_app/features/english_club/data/models/create_section_response.dart';
 import 'package:english_app/features/english_club/data/models/delete_section_response.dart';
+import 'package:english_app/features/english_club/data/models/delete_sub_level_response.dart';
 import 'package:english_app/features/english_club/data/models/edit_section_name_request_body.dart';
 import 'package:english_app/features/english_club/data/models/edit_section_name_response.dart';
 import 'package:english_app/features/english_club/data/models/english_club_response.dart';
@@ -173,5 +174,13 @@ abstract class ApiService {
   @DELETE("admin/sections/{delete_section_id}")
   Future<DeleteSectionResponse> deleteSection(
     @Path("delete_section_id") String deleteSectionId,
+  );
+  // delete sub level
+  @DELETE(
+    "admin/sections/levels/{delete_level_id}/subLevels/{Delete_sub_level_id}",
+  )
+  Future<DeleteSubLevelResponse> deleteSubLevel(
+    @Path("delete_level_id") String deleteLevelId,
+    @Path("delete_sub_level_id") String deleteSubLevelId,
   );
 }

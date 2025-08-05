@@ -5,10 +5,12 @@ import 'package:english_app/features/add_students_manually/logic/create_student_
 
 import 'package:english_app/features/english_club/data/repos/create_section_repo.dart';
 import 'package:english_app/features/english_club/data/repos/delete_section_repo.dart';
+import 'package:english_app/features/english_club/data/repos/delete_sub_level_repo.dart';
 import 'package:english_app/features/english_club/data/repos/edit_section_name_repo.dart';
 import 'package:english_app/features/english_club/data/repos/english_club_repo.dart';
 import 'package:english_app/features/english_club/logic/create_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/delete_section_cubit.dart';
+import 'package:english_app/features/english_club/logic/delete_sub_level_cubit.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
 import 'package:english_app/features/manage_grades_and_classes/data/repos/create_class_repo.dart';
@@ -155,4 +157,11 @@ Future<void> setupGetIt() async {
     () => DeleteSectionRepo(getIt()),
   );
   getIt.registerFactory<DeleteSectionCubit>(() => DeleteSectionCubit(getIt()));
+  // delete sub level
+  getIt.registerLazySingleton<DeleteSubLevelRepo>(
+    () => DeleteSubLevelRepo(getIt()),
+  );
+  getIt.registerFactory<DeleteSubLevelCubit>(
+    () => DeleteSubLevelCubit(getIt()),
+  );
 }

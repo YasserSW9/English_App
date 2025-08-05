@@ -13,7 +13,6 @@ import 'package:english_app/features/english_club/logic/english_club_cubit.dart'
 import 'package:english_app/features/english_club/logic/english_club_state.dart';
 import 'package:english_app/features/english_club/ui/widgets/english_club_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
