@@ -177,7 +177,7 @@ abstract class ApiService {
   );
   // delete sub level
   @DELETE(
-    "admin/sections/levels/{delete_level_id}/subLevels/{Delete_sub_level_id}",
+    "admin/sections/levels/{delete_level_id}/subLevels/{delete_sub_level_id}",
   )
   Future<DeleteSubLevelResponse> deleteSubLevel(
     @Path("delete_level_id") String deleteLevelId,

@@ -7,6 +7,8 @@ import 'package:english_app/features/english_club/logic/create_section_cubit.dar
 import 'package:english_app/features/english_club/logic/create_section_state.dart';
 import 'package:english_app/features/english_club/logic/delete_section_cubit.dart';
 import 'package:english_app/features/english_club/logic/delete_section_state.dart';
+import 'package:english_app/features/english_club/logic/delete_sub_level_cubit.dart';
+import 'package:english_app/features/english_club/logic/delete_sub_level_state.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_cubit.dart';
 import 'package:english_app/features/english_club/logic/edit_section_name_state.dart';
 import 'package:english_app/features/english_club/logic/english_club_cubit.dart';
@@ -152,6 +154,36 @@ class _EnglishclubState extends State<Englishclub> {
               );
             },
           ),
+          BlocListener<DeleteSubLevelCubit, DeleteSubLevelState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                loading: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Deleting sub-level...')),
+                  );
+                },
+                success: (data) {
+                  context.read<EnglishClubCubit>().emitGetEnglishClubSections();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(data.message!),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+                error: (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error: Failed to delete sub-level: ${error.toString()}',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
         child: BlocBuilder<EnglishClubCubit, EnglishClubState>(
           builder: (context, state) {
@@ -206,7 +238,6 @@ class _EnglishclubState extends State<Englishclub> {
                             (element) =>
                                 element.sectionName == _selectedSectionName,
                           );
-                      //! Todo sectionid
                       selectedSectionId = selectedClubData?.sectionId;
                     }
 
@@ -216,6 +247,14 @@ class _EnglishclubState extends State<Englishclub> {
                         flatSubDataList.addAll(clubDataItem.data!);
                       }
                     }
+
+                    final Map<String, List<ClubSubData>> groupedSubData =
+                        groupBy(
+                          flatSubDataList,
+                          (subData) =>
+                              subData.name?.split('/').first.trim() ??
+                              'Unknown Sub-Section',
+                        );
 
                     return Column(
                       children: [
@@ -389,7 +428,7 @@ class _EnglishclubState extends State<Englishclub> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        if (flatSubDataList.isEmpty)
+                        if (groupedSubData.isEmpty)
                           const Expanded(
                             child: Center(
                               child: Text(
@@ -397,22 +436,27 @@ class _EnglishclubState extends State<Englishclub> {
                               ),
                             ),
                           ),
-                        if (flatSubDataList.isNotEmpty)
+                        if (groupedSubData.isNotEmpty)
                           Expanded(
                             child: ListView.builder(
-                              itemCount: flatSubDataList.length,
+                              itemCount: groupedSubData.length,
                               itemBuilder: (context, index) {
-                                final ClubSubData subDataItem =
-                                    flatSubDataList[index];
+                                final String groupName = groupedSubData.keys
+                                    .toList()[index];
+                                final List<ClubSubData> subDataListForGroup =
+                                    groupedSubData[groupName]!;
+                                final ClubSubData? subLevelDataForGroup =
+                                    subDataListForGroup.firstOrNull;
 
-                                final String expansionTileTitle =
-                                    subDataItem.name != null &&
-                                        subDataItem.name!.contains('/')
-                                    ? subDataItem.name!.split('/').last.trim()
-                                    : subDataItem.name ?? 'Sub-Section N/A';
+                                final List<Widget> storiesGridWidgets = [];
+                                for (var subDataItem in subDataListForGroup) {
+                                  final String expansionTileTitle =
+                                      subDataItem.name != null &&
+                                          subDataItem.name!.contains('/')
+                                      ? subDataItem.name!.split('/').last.trim()
+                                      : 'Sub-Section N/A';
 
-                                return Column(
-                                  children: [
+                                  storiesGridWidgets.add(
                                     Slidable(
                                       endActionPane: ActionPane(
                                         motion: const ScrollMotion(),
@@ -424,7 +468,7 @@ class _EnglishclubState extends State<Englishclub> {
                                               ).showSnackBar(
                                                 const SnackBar(
                                                   content: Text(
-                                                    'Add Level action triggered!',
+                                                    'Add story action triggered!',
                                                   ),
                                                 ),
                                               );
@@ -432,7 +476,7 @@ class _EnglishclubState extends State<Englishclub> {
                                             backgroundColor: Colors.green,
                                             foregroundColor: Colors.white,
                                             icon: Icons.add_circle_outline,
-                                            label: 'Add Sub Level',
+                                            label: 'Add Story',
                                           ),
                                         ],
                                       ),
@@ -446,70 +490,56 @@ class _EnglishclubState extends State<Englishclub> {
                                               ).showSnackBar(
                                                 const SnackBar(
                                                   content: Text(
-                                                    'Delete action triggered!',
+                                                    'Edit action triggered!',
                                                   ),
                                                 ),
                                               );
+                                            },
+                                            backgroundColor: Colors.blue,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.edit,
+                                            label: 'Edit',
+                                          ),
+                                          SlidableAction(
+                                            onPressed: (context) {
+                                              final String? levelIdStr =
+                                                  subDataItem.levelId
+                                                      ?.toString();
+                                              final String? subLevelIdStr =
+                                                  subDataItem.subLevelId
+                                                      ?.toString();
+
+                                              if (levelIdStr != null &&
+                                                  subLevelIdStr != null) {
+                                                debugPrint(
+                                                  'Deleting individual sub-level: Level ID: $levelIdStr, Sub-Level ID: $subLevelIdStr',
+                                                );
+                                                context
+                                                    .read<DeleteSubLevelCubit>()
+                                                    .emitDeleteSubLevel(
+                                                      levelIdStr,
+                                                      subLevelIdStr,
+                                                    );
+                                              } else {
+                                                debugPrint(
+                                                  'Failed to delete. Level ID: ${subDataItem.levelId}, Sub-Level ID: ${subDataItem.subLevelId}',
+                                                );
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Level ID or Sub-Level ID is missing for this story.',
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
                                             },
                                             backgroundColor: Colors.red,
                                             foregroundColor: Colors.white,
                                             icon: Icons.delete,
                                             label: 'Delete',
-                                          ),
-                                        ],
-                                      ),
-                                      child: InkWell(
-                                        onTap: () {
-                                          context.pushNamed(
-                                            Routes.levelControlPanel,
-                                          );
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 5,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 15,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.orange,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              subDataItem.name
-                                                      ?.split('/')
-                                                      .first
-                                                      .trim() ??
-                                                  'Sub-Section Name N/A',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey,
-                                            spreadRadius: 1,
-                                            blurRadius: 3,
-                                            offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
@@ -556,7 +586,6 @@ class _EnglishclubState extends State<Englishclub> {
                                                           final Stories
                                                           story = subDataItem
                                                               .stories![storyIndex];
-
                                                           return Container(
                                                             decoration: BoxDecoration(
                                                               border: Border.all(
@@ -659,6 +688,145 @@ class _EnglishclubState extends State<Englishclub> {
                                                   ),
                                           ),
                                         ],
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return Column(
+                                  children: [
+                                    Slidable(
+                                      endActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        children: [
+                                          SlidableAction(
+                                            onPressed: (context) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Add Level action triggered!',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            backgroundColor: Colors.green,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.add_circle_outline,
+                                            label: 'Add Sub Level',
+                                          ),
+                                        ],
+                                      ),
+                                      startActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        children: [
+                                          SlidableAction(
+                                            onPressed: (context) {
+                                              final String? levelIdStr =
+                                                  subLevelDataForGroup?.levelId
+                                                      ?.toString();
+                                              final String? subLevelIdStr =
+                                                  subLevelDataForGroup
+                                                      ?.subLevelId
+                                                      ?.toString();
+
+                                              if (levelIdStr != null &&
+                                                  subLevelIdStr != null) {
+                                                debugPrint(
+                                                  'Deleting group: Level ID: $levelIdStr, Sub-Level ID: $subLevelIdStr',
+                                                );
+                                                context
+                                                    .read<DeleteSubLevelCubit>()
+                                                    .emitDeleteSubLevel(
+                                                      levelIdStr,
+                                                      subLevelIdStr,
+                                                    );
+                                              } else {
+                                                debugPrint(
+                                                  'Failed to delete group. Level ID: ${subLevelDataForGroup?.levelId}, Sub-Level ID: ${subLevelDataForGroup?.subLevelId}',
+                                                );
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Level ID or Sub-Level ID is missing for this group.',
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.delete,
+                                            label: 'Delete',
+                                          ),
+                                        ],
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          context.pushNamed(
+                                            Routes.levelControlPanel,
+                                          );
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 15,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              groupName,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            spreadRadius: 1,
+                                            blurRadius: 3,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ExpansionTile(
+                                        title: Center(
+                                          child: Text(
+                                            'Sub-Levels for $groupName',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ),
+                                        children: storiesGridWidgets,
                                       ),
                                     ),
                                     const SizedBox(height: 10),
